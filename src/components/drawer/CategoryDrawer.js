@@ -7,15 +7,18 @@ import SwitchToggle from "components/form/SwitchToggle";
 import TextAreaCom from "components/form/TextAreaCom";
 import Title from "components/form/Title";
 import Uploader from "components/image-uploader/Uploader";
+import RSelect from "components/select";
 import useCategorySubmit from "hooks/useCategorySubmit";
 import Tree from "rc-tree";
 import React from "react";
 import Scrollbars from "react-custom-scrollbars-2";
 import { useTranslation } from "react-i18next";
+
 //internal import
 import CategoryServices from "services/CategoryServices";
 import { notifyError } from "utils/toast";
 import { showingTranslateValue } from "utils/translate";
+
 
 const CategoryDrawer = ({ id, data, lang }) => {
   const { t } = useTranslation();
@@ -78,9 +81,9 @@ const CategoryDrawer = ({ id, data, lang }) => {
     return obj._id === target
       ? obj
       : obj?.children?.reduce(
-          (acc, obj) => acc ?? findObject(obj, target),
-          undefined
-        );
+        (acc, obj) => acc ?? findObject(obj, target),
+        undefined
+      );
   };
 
   const handleSelect = async (key) => {
@@ -113,22 +116,30 @@ const CategoryDrawer = ({ id, data, lang }) => {
     }
   };
 
+  const options = [
+    { value: 'chocolate', label: 'Chocolate' },
+    { value: 'strawberry', label: 'Strawberry' },
+    { value: 'vanilla', label: 'Vanilla' },
+  ];
+  const handleUploadMultipleImages = (e) => {
+
+  }
   return (
     <>
       <div className="w-full relative p-6 border-b border-gray-100 bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
         {id ? (
           <Title
             register={register}
-            handleSelectLanguage={handleSelectLanguage}
+           // handleSelectLanguage={handleSelectLanguage}
             title={t("UpdateCategory")}
-            description={t("UpdateCategoryDescription")}
+           // description={t("UpdateCategoryDescription")}
           />
         ) : (
           <Title
             register={register}
-            handleSelectLanguage={handleSelectLanguage}
-            title={t("AddCategoryTitle")}
-            description={t("AddCategoryDescription")}
+           // handleSelectLanguage={handleSelectLanguage}
+            title={t("Category information")}
+          //description={t("AddCategoryDescription")}
           />
         )}
       </div>
@@ -141,17 +152,145 @@ const CategoryDrawer = ({ id, data, lang }) => {
               <div className="col-span-8 sm:col-span-4">
                 <InputArea
                   register={register}
-                  label="Category title"
+                  label="Name"
                   name="name"
                   type="text"
                   placeholder={t("ParentCategoryPlaceholder")}
+
                 />
                 <Error errorName={errors.name} />
               </div>
             </div>
 
+
+
             <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
-              <LabelArea label={t("Description")} />
+              <LabelArea label={t("Parent Category")} />
+              <div className="col-span-8 sm:col-span-4">
+                <RSelect
+                  options={options}
+                  placeholder="No Parent"
+                // onChange={(e) => {
+                //   formik?.setFieldValue("categoryId", e);
+                // }}
+                // error={formik?.errors?.categoryId}
+                // touched={formik?.touched?.categoryId}
+                // onBlur={formik?.handleBlur}
+                // value={formik?.values?.categoryId}
+                // name="category"
+                // id="category"
+                ></RSelect>
+                <Error errorName={errors.name} />
+              </div>
+            </div>
+
+
+            <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+              <LabelArea label={t("Order Number")} />
+              <div className="col-span-8 sm:col-span-4">
+                <InputArea
+                  register={register}
+                  label=""
+                  name="parent"
+                  type="text"
+                  placeholder="Order Level"
+
+                />
+                <span>Higher number has high priarity </span>
+                <Error errorName={errors.name} />
+              </div>
+            </div>
+
+
+
+            <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+              <LabelArea label={t("Type")} />
+              <div className="col-span-8 sm:col-span-4">
+                <RSelect
+                  options={options}
+                  placeholder="Phaysical"
+                // onChange={(e) => {
+                //   formik?.setFieldValue("categoryId", e);
+                // }}
+                // error={formik?.errors?.categoryId}
+                // touched={formik?.touched?.categoryId}
+                // onBlur={formik?.handleBlur}
+                // value={formik?.values?.categoryId}
+                // name="category"
+                // id="category"
+                ></RSelect>
+                <Error errorName={errors.name} />
+              </div>
+            </div>
+
+
+            <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+              <LabelArea label={t("Banner (200x200)")} />
+              <div className="col-span-8 sm:col-span-4">
+                <div className="bg-white border-solid	border-2 border-gray">
+                <div className="border-solid border-2 bg-gray-200 p-2 inline-block">
+                <label htmlFor="premiumPhoto">
+                  {/* <MdOutlineAdd  /> */}
+                  Browse
+                </label>
+                </div>
+                  <input type="file" id="premiumPhoto" multiple={true} onChange={(e) => handleUploadMultipleImages(e, "photos")} />
+                </div>
+
+              </div>
+            </div>
+            <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+              <LabelArea label={t("Icon (32x32)")} />
+              <div className="col-span-8 sm:col-span-4">
+                <div className="bg-white border-solid	border-2 border-gray">
+                <div className="border-solid border-2 bg-gray-200 p-2 inline-block">
+                <label htmlFor="premiumPhoto">
+                  {/* <MdOutlineAdd  /> */}
+                  Browse
+                </label>
+                </div>
+                  <input type="file" id="premiumPhoto" multiple={true} onChange={(e) => handleUploadMultipleImages(e, "photos")} />
+                </div>
+
+              </div>
+            </div>
+
+
+            <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+              <LabelArea label={t("Cover Image (250x250)")} />
+              <div className="col-span-8 sm:col-span-4">
+                <div className="bg-white border-solid	border-2 border-gray">
+                <div className="border-solid border-2 bg-gray-200 p-2 inline-block">
+                <label htmlFor="premiumPhoto">
+                  {/* <MdOutlineAdd  /> */}
+                  Browse
+                </label>
+                </div>
+                  <input type="file" id="premiumPhoto" multiple={true} onChange={(e) => handleUploadMultipleImages(e, "photos")} />
+                </div>
+
+              </div>
+            </div>
+
+            <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+              <LabelArea label={t("Meta Title")} />
+              <div className="col-span-8 sm:col-span-4">
+                <InputArea
+                  register={register}
+                  label="Name"
+                  name="name"
+                  type="text" 
+                  placeholder='Meta Title'
+
+                />
+                <Error errorName={errors.name} />
+              </div>
+            </div>
+
+
+
+            <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+              <LabelArea label={t(" Mata Description")} />
               <div className="col-span-8 sm:col-span-4">
                 <TextAreaCom
                   required
@@ -159,13 +298,12 @@ const CategoryDrawer = ({ id, data, lang }) => {
                   label="Description"
                   name="description"
                   type="text"
-                  placeholder="Category Description"
                 />
                 <Error errorName={errors.description} />
               </div>
             </div>
 
-            <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+            {/* <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
               <LabelArea label={t("ParentCategory")} />
               <div className="col-span-8 sm:col-span-4 relative">
                 <Input
@@ -192,20 +330,44 @@ const CategoryDrawer = ({ id, data, lang }) => {
                   />
                 </div>
               </div>
+            </div> */}
+
+
+
+            <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+              <LabelArea label={t("Filtering Attributes")} />
+              <div className="col-span-8 sm:col-span-4">
+                <RSelect
+                  options={options}
+                  placeholder="Noting Select"
+                // onChange={(e) => {
+                //   formik?.setFieldValue("categoryId", e);
+                // }}
+                // error={formik?.errors?.categoryId}
+                // touched={formik?.touched?.categoryId}
+                // onBlur={formik?.handleBlur}
+                // value={formik?.values?.categoryId}
+                // name="category"
+                // id="category"
+                ></RSelect>
+                <Error errorName={errors.name} />
+              </div>
             </div>
 
             <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
-              <LabelArea label={t("CategoryIcon")} />
+              {/* <LabelArea label={t("CategoryIcon")} />
               <div className="col-span-8 sm:col-span-4">
                 <Uploader
                   imageUrl={imageUrl}
                   setImageUrl={setImageUrl}
                   folder="category"
                 />
-              </div>
+              </div> */}
+
+
             </div>
 
-            <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+            {/* <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
               <LabelArea label={t("Published")} />
               <div className="col-span-8 sm:col-span-4">
                 <SwitchToggle
@@ -213,10 +375,10 @@ const CategoryDrawer = ({ id, data, lang }) => {
                   processOption={published}
                 />
               </div>
-            </div>
+            </div> */}
           </div>
 
-          <DrawerButton id={id} title="Category" isSubmitting={isSubmitting} />
+          <DrawerButton id={id} title="Save" isSubmitting={isSubmitting} />
         </form>
       </Scrollbars>
     </>

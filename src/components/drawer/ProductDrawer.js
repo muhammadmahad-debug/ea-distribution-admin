@@ -30,18 +30,21 @@ import ParentCategory from "components/category/ParentCategory";
 import InputValue from "components/form/InputValue";
 import InputValueFive from "components/form/InputValueFive";
 import AttributeOptionTwo from "components/attribute/AttributeOptionTwo";
+import RSelect from "components/select";
 import DrawerButton from "components/form/DrawerButton";
 import AttributeListTable from "components/attribute/AttributeListTable";
 import { showingTranslateValue } from "utils/translate";
 import useAsync from "hooks/useAsync";
 import CustomerServices from "services/CustomerServices";
+import Switcher from "components/bth";
+import ShowHideButton from "components/table/ShowHideButton";
 
 //internal import
 
 const ProductDrawer = ({ id }) => {
   const { t } = useTranslation();
-  
- 
+
+
   const {
     tag,
     setTag,
@@ -91,8 +94,14 @@ const ProductDrawer = ({ id }) => {
 
   const currency = globalSetting?.default_currency || "$";
 
+  const options = [
+    { value: 'chocolate', label: 'Chocolate' },
+    { value: 'strawberry', label: 'Strawberry' },
+    { value: 'vanilla', label: 'Vanilla' },
+  ];
+  const handleUploadMultipleImages = (e) => {
 
-  
+  }
 
   return (
     <>
@@ -119,32 +128,32 @@ const ProductDrawer = ({ id }) => {
         {id ? (
           <Title
             register={register}
-            handleSelectLanguage={handleSelectLanguage}
+            //handleSelectLanguage={handleSelectLanguage}
             title={t("UpdateProduct")}
-            description={t("UpdateProductDescription")}
+          //  description={t("UpdateProductDescription")}
           />
         ) : (
           <Title
             register={register}
-            handleSelectLanguage={handleSelectLanguage}
-            title={t("DrawerAddProduct")}
-            description={t("AddProductDescription")}
+            //handleSelectLanguage={handleSelectLanguage}
+            title={t("Add new Product")}
+          // description={t("AddProductDescription")}
           />
         )}
       </div>
 
       <div className="text-sm font-medium text-center text-gray-500 border-b border-gray-200 dark:text-gray-400 dark:border-gray-600 dark:bg-gray-700">
-        <SwitchToggleForCombination
+        {/* <SwitchToggleForCombination
           product
           handleProcess={handleIsCombination}
           processOption={isCombination}
-        />
+        /> */}
 
         <ul className="flex flex-wrap -mb-px">
           <li className="mr-2">
             <ActiveButton
               tapValue={tapValue}
-              activeValue="Basic Info"
+              activeValue="Product Information"
               handleProductTap={handleProductTap}
             />
           </li>
@@ -164,44 +173,836 @@ const ProductDrawer = ({ id }) => {
       <Scrollbars className="track-horizontal thumb-horizontal w-full md:w-7/12 lg:w-8/12 xl:w-8/12 relative dark:bg-gray-700 dark:text-gray-200">
         <form onSubmit={handleSubmit(onSubmit)} className="block" id="block">
           {tapValue === "Basic Info" && (
-            <div className="px-6 pt-8 flex-grow w-full h-full max-h-full pb-40 md:pb-32 lg:pb-32 xl:pb-32">
-              {/* <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+            <div className="flex">
+              <div className="w-3/4 px-3 py-0">
+                <div className="px-6 pt-8 flex-grow w-full h-full max-h-full pb-40 md:pb-32 lg:pb-32 xl:pb-32">
+                  {/* <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
                 <LabelArea label={t("ProductID")} />
                 <div className="col-span-8 sm:col-span-4">{productId}</div>
               </div> */}
-              <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
-                <LabelArea label={t("ProductTitleName")} />
-                <div className="col-span-8 sm:col-span-4">
-                  <Input
-                    {...register(`title`, {
-                      required: "TItle is required!",
-                    })}
-                    className="border h-12 text-sm focus:outline-none block w-full bg-gray-100 dark:bg-white border-transparent focus:bg-white"
-                    name="title"
-                    type="text"
-                    placeholder={t("ProductTitleName")}
-                    onBlur={(e) => handleProductSlug(e.target.value)}
-                  />
-                  <Error errorName={errors.title} />
+                  <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+                    <LabelArea label={t("Product Name*")} />
+                    <div className="col-span-8 sm:col-span-4">
+                      <Input
+                        {...register(`title`, {
+                          required: "TItle is required!",
+                        })}
+                        className="border h-12 text-sm focus:outline-none block w-full bg-gray-100 dark:bg-white border-transparent focus:bg-white"
+                        name="title"
+                        type="text"
+                        placeholder={t("Product Name")}
+                        onBlur={(e) => handleProductSlug(e.target.value)}
+                      />
+                      <Error errorName={errors.title} />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+                    <LabelArea label={t("Category*")} />
+                    <div className="col-span-8 sm:col-span-4">
+                      <RSelect
+                        options={options}
+                        placeholder="Category"
+                      // onChange={(e) => {
+                      //   formik?.setFieldValue("categoryId", e);
+                      // }}
+                      // error={formik?.errors?.categoryId}
+                      // touched={formik?.touched?.categoryId}
+                      // onBlur={formik?.handleBlur}
+                      // value={formik?.values?.categoryId}
+                      // name="category"
+                      // id="category"
+                      ></RSelect>
+                    </div>
+                  </div>
+
+
+                  <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+                    <LabelArea label={t("Brand")} />
+                    <div className="col-span-8 sm:col-span-4">
+                      <RSelect
+                        options={options}
+                        placeholder="Select Brand"
+                      // onChange={(e) => {
+                      //   formik?.setFieldValue("categoryId", e);
+                      // }}
+                      // error={formik?.errors?.categoryId}
+                      // touched={formik?.touched?.categoryId}
+                      // onBlur={formik?.handleBlur}
+                      // value={formik?.values?.categoryId}
+                      // name="category"
+                      // id="category"
+                      ></RSelect>
+                    </div>
+                  </div>
+
+
+
+                  <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+                    <LabelArea label="Unit" />
+                    <div className="col-span-8 sm:col-span-4">
+                      <InputArea
+                        register={register}
+                        label="Name"
+                        name="name"
+                        type="text"
+                        placeholder="Unit (e.g KG,Pc etc)"
+
+                      />
+                      <Error errorName={errors.name} />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+                    <LabelArea label="Weight (in kg)" />
+                    <div className="col-span-8 sm:col-span-4">
+                      <InputArea
+                        register={register}
+                        label="Name"
+                        name="name"
+                        type="number"
+                        placeholder="0.00"
+
+                      />
+                      <Error errorName={errors.name} />
+                    </div>
+                  </div>
+
+
+                  <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+                    <LabelArea label="Minimum Purchase Oty*" />
+                    <div className="col-span-8 sm:col-span-4">
+                      <InputArea
+                        register={register}
+                        label="Name"
+                        name="name"
+                        type="number"
+                        placeholder="1"
+
+                      />
+                      <Error errorName={errors.name} />
+                    </div>
+                  </div>
+
+
+                  <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+                    <LabelArea label="Tags*" />
+                    <div className="col-span-8 sm:col-span-4">
+                      <InputArea
+                        register={register}
+                        label="Name"
+                        name="name"
+                        type="text"
+                        placeholder="Type and hit enter to add a tag"
+
+                      />
+                      <span>This is use for search input those words by which customer can find this product</span>
+                      <Error errorName={errors.name} />
+                    </div>
+                  </div>
+
+
+                  <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+                    <LabelArea label="Barcode" />
+                    <div className="col-span-8 sm:col-span-4">
+                      <InputArea
+                        register={register}
+                        label="Name"
+                        name="name"
+                        type="text"
+                        placeholder="Barcode"
+
+                      />
+
+                      <Error errorName={errors.name} />
+                    </div>
+                  </div>
+
+
+
+                  <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+                    <LabelArea label="Refundable" />
+                    <div className="col-span-8 sm:col-span-4">
+                      <ShowHideButton status="show" />
+                    </div>
+                  </div>
+
+
+                  <div className="w-full relative pb-2 mb-6 border-b border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
+
+                    <Title
+                      register={register}
+
+                      title={t("Product Image")}
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+                    <LabelArea label={t("Gallery Image (500x500)")} />
+                    <div className="col-span-8 sm:col-span-4">
+                      <div className="bg-white border-solid	border-2 border-gray">
+                        <div className="border-solid border-2 bg-gray-200 p-2 inline-block">
+                          <label htmlFor="premiumPhoto">
+                            {/* <MdOutlineAdd  /> */}
+                            Browse
+                          </label>
+                        </div>
+                        <input type="file" id="premiumPhoto" multiple={true} onChange={(e) => handleUploadMultipleImages(e, "photos")} />
+                      </div>
+
+                    </div>
+                  </div>
+
+
+                  <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+                    <LabelArea label={t("Thumbnail Image (300x300)")} />
+                    <div className="col-span-8 sm:col-span-4">
+                      <div className="bg-white border-solid	border-2 border-gray">
+                        <div className="border-solid border-2 bg-gray-200 p-2 inline-block">
+                          <label htmlFor="premiumPhoto">
+                            {/* <MdOutlineAdd  /> */}
+                            Browse
+                          </label>
+                        </div>
+                        <input type="file" id="premiumPhoto" multiple={true} onChange={(e) => handleUploadMultipleImages(e, "photos")} />
+                      </div>
+
+                    </div>
+                  </div>
+
+
+                  <div className="w-full relative pb-2 mb-6 border-b border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
+                    <Title
+                      register={register}
+
+                      title={t("Product Video")}
+                    />
+                  </div>
+                  <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+                    <LabelArea label={t("Video Provider")} />
+                    <div className="col-span-8 sm:col-span-4">
+                      <InputArea
+                        register={register}
+                        label="Name"
+                        name="name"
+                        type="text"
+                        placeholder='YouTube'
+
+                      />
+
+                    </div>
+                  </div>
+
+
+                  <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+                    <LabelArea label={t("Video Link")} />
+                    <div className="col-span-8 sm:col-span-4">
+                      <InputArea
+                        register={register}
+                        label="Name"
+                        name="name"
+                        type="text"
+                        placeholder='Video Link'
+                      />
+                      <span>use proper link without extra paramater.Dont use short share link/embeded iframe code</span>
+                    </div>
+                  </div>
+
+
+                  <div className="w-full relative pb-2 mb-6 border-b border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
+                    <Title
+                      register={register}
+
+                      title={t("Product Variation")}
+                    />
+                  </div>
+                  <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+                    <LabelArea label={t("Color")} />
+                    <div className="col-span-8 sm:col-span-4">
+                      <RSelect
+                        options={options}
+                        placeholder='nothing Selected'
+                      >
+
+                      </RSelect>
+
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+                      <LabelArea label={t("Attributes")} />
+                      <div className="col-span-8 sm:col-span-4">
+                        <RSelect
+                          options={options}
+                          placeholder='nothing Selected'
+                        >
+                        </RSelect>
+                      </div>
+                    </div>
+                    <span>chosse the attributes off product and input valuse of each attribute</span>
+                  </div>
+
+                  <div className="w-full relative pb- mb-6 border-b border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
+                    <Title
+                      register={register}
+
+                      title={t("Product price + stock")}
+                    />
+                  </div>
+                  <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+                    <LabelArea label={t("Unit price*")} />
+                    <div className="col-span-8 sm:col-span-4">
+                      <InputArea
+                        register={register}
+                        required="false"
+                        label='unitprice'
+                        name="unitprice"
+                        type="number"
+                        placeholder='0'
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+                    <LabelArea label={t("Discount data Range")} />
+                    <div className="col-span-8 sm:col-span-4">
+                      <InputArea
+                        register={register}
+                        required="false"
+                        label='unitprice'
+                        name="unitprice"
+                        type="text"
+                        placeholder='Select data'
+                      />
+                    </div>
+                  </div>
+
+
+                  <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+                    <LabelArea label={t("Discount")} />
+                    <div className="col-span-8 sm:col-span-4">
+                      <InputArea
+                        register={register}
+                        required="false"
+                        label='unitprice'
+                        name="unitprice"
+                        type="text"
+                        placeholder='Discount'
+                      />
+                      <RSelect
+                        options={options}
+                        placeholder='Flat'
+
+                      >
+
+                      </RSelect>
+                    </div>
+
+                  </div>
+
+
+                  <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+                    <LabelArea label={t("Set Point")} />
+                    <div className="col-span-8 sm:col-span-4">
+                      <InputArea
+                        register={register}
+                        required="false"
+                        label='unitprice'
+                        name="unitprice"
+                        type="number"
+                        placeholder='0'
+                      />
+                    </div>
+                  </div>
+
+
+                  <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+                    <LabelArea label={t("Quantity")} />
+                    <div className="col-span-8 sm:col-span-4">
+                      <InputArea
+                        register={register}
+                        required="false"
+                        label='unitprice'
+                        name="unitprice"
+                        type="number"
+                        placeholder='0'
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+                    <LabelArea label={t("ProductSKU")} />
+                    <div className="col-span-8 sm:col-span-4">
+                      <InputArea
+                        register={register}
+                        required="false"
+                        label={t("ProductSKU")}
+                        name="sku"
+                        type="text"
+                        placeholder={t("ProductSKU")}
+                      />
+                      <Error errorName={errors.sku} />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+                    <LabelArea label={t("External Link")} />
+                    <div className="col-span-8 sm:col-span-4">
+                      <InputArea
+                        register={register}
+                        required="false"
+                        label='unitprice'
+                        name="unitprice"
+                        type="text"
+                        placeholder='External Link'
+                      />
+                      <span>Leave it blanck if you do not use external site link</span>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+                    <LabelArea label={t("External Link button")} />
+                    <div className="col-span-8 sm:col-span-4">
+                      <InputArea
+                        register={register}
+                        required="false"
+                        label='unitprice'
+                        name="unitprice"
+                        type="text"
+                        placeholder='External Link button text'
+                      />
+                      <span>Leave it blanck if you do not use external site link</span>
+                    </div>
+                  </div>
+
+                  <div className="w-full relative pb- mb-6 border-b border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
+                    <Title
+                      register={register}
+
+                      title={t("Product Description")}
+                    />
+                  </div>
+
+
+                  <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+                    <LabelArea label={t("ProductDescription")} />
+                    <div className="col-span-8 sm:col-span-4">
+                      <Textarea
+                        className="border text-sm focus:outline-none block w-full bg-gray-100 border-transparent focus:bg-white"
+                        {...register("description", {
+                          required: false,
+                        })}
+                        name="description"
+                        placeholder={t("ProductDescription")}
+                        rows="4"
+                        spellCheck="false"
+                      />
+                      <Error errorName={errors.description} />
+                    </div>
+                  </div>
+
+
+                  <div className="w-full relative pb- mb-6 border-b border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
+                    <Title
+                      register={register}
+
+                      title={t("PDF Specification")}
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+                    <LabelArea label={t("PDF Specification")} />
+                    <div className="col-span-8 sm:col-span-4">
+                      <div className="bg-white border-solid	border-2 border-gray">
+                        <div className="border-solid border-2 bg-gray-200 p-2 inline-block">
+                          <label htmlFor="premiumPhoto">
+                            {/* <MdOutlineAdd  /> */}
+                            Browse
+                          </label>
+                        </div>
+                        <input type="file" id="premiumPhoto" multiple={true} onChange={(e) => handleUploadMultipleImages(e, "photos")} />
+                      </div>
+
+                    </div>
+                  </div>
+
+
+                  <div className="w-full relative pb- mb-6 border-b border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
+                    <Title
+                      register={register}
+
+                      title={t("SEO Meta Tags")}
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+                    <LabelArea label={t("Meta Title")} />
+                    <div className="col-span-8 sm:col-span-4">
+                      <InputArea
+                        register={register}
+                        label="Name"
+                        name="name"
+                        type="text"
+                        placeholder='Meta Title'
+
+                      />
+                      <Error errorName={errors.name} />
+                    </div>
+                  </div>
+
+
+                  <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+                    <LabelArea label={t("Description")} />
+                    <div className="col-span-8 sm:col-span-4">
+                      <Textarea
+                        className="border text-sm focus:outline-none block w-full bg-gray-100 border-transparent focus:bg-white"
+                        {...register("description", {
+                          required: false,
+                        })}
+                        name="description"
+                        placeholder={t("Description")}
+                        rows="4"
+                        spellCheck="false"
+                      />
+                      <Error errorName={errors.description} />
+                    </div>
+                  </div>
+
+
+                  <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+                    <LabelArea label={t("Meta Image")} />
+                    <div className="col-span-8 sm:col-span-4">
+                      <div className="bg-white border-solid	border-2 border-gray">
+                        <div className="border-solid border-2 bg-gray-200 p-2 inline-block">
+                          <label htmlFor="premiumPhoto">
+                            {/* <MdOutlineAdd  /> */}
+                            Browse
+                          </label>
+                        </div>
+                        <input type="file" id="premiumPhoto" multiple={true} onChange={(e) => handleUploadMultipleImages(e, "photos")} />
+                      </div>
+
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
-                <LabelArea label={t("ProductDescription")} />
-                <div className="col-span-8 sm:col-span-4">
-                  <Textarea
-                    className="border text-sm focus:outline-none block w-full bg-gray-100 border-transparent focus:bg-white"
-                    {...register("description", {
-                      required: false,
-                    })}
-                    name="description"
-                    placeholder={t("ProductDescription")}
-                    rows="4"
-                    spellCheck="false"
-                  />
-                  <Error errorName={errors.description} />
+
+              <div className="w-1/4 pl-3 pr-6 py-0">
+
+                <div className="bg-white shadow-md p-4 mb-8">
+                  <div className="w-full relative pb- mb-6 border-b border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
+                    <Title
+                      register={register}
+
+                      title={t("Shipping Configuration")}
+                    />
+                  </div>
+
+                  <div>
+                    <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+                      <LabelArea label={t("Free Shipping ")} />
+                      <div className="col-span-8 sm:col-span-4">
+                        <ShowHideButton status={true} />
+
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+                      <LabelArea label={t("Flat Rate ")} />
+                      <div className="col-span-8 sm:col-span-4">
+                        <ShowHideButton status={true} />
+
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+                      <LabelArea label={t("is Product Quantity Multiply ")} />
+                      <div className="col-span-8 sm:col-span-4">
+                        <ShowHideButton status={true} />
+
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+
+
+                <div>
+                  <div className="bg-white shadow-md p-4 mb-8">
+                    <div className="w-full relative pb- mb-6 border-b border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
+                      <Title
+                        register={register}
+
+                        title={t("low stock Quantity Warning")}
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+                      <LabelArea label={t("Quantity ")} />
+                      <div className="col-span-8 sm:col-span-4">
+                        <InputArea
+                          register={register}
+                          label="Name"
+                          name="name"
+                          type="number"
+                          placeholder="1"
+
+                        />
+
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+
+                <div className="bg-white shadow-md p-4 mb-8">
+                  <div className="w-full relative pb- mb-6 border-b border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
+                    <Title
+                      register={register}
+
+                      title={t("Stock Visibility state")}
+                    />
+                  </div>
+
+                  <div>
+                    <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+                      <LabelArea label={t("Show Stock Quantity ")} />
+                      <div className="col-span-8 sm:col-span-4">
+                        <ShowHideButton status={true} />
+
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+                      <LabelArea label={t("show stock with text only ")} />
+                      <div className="col-span-8 sm:col-span-4">
+                        <ShowHideButton status={true} />
+
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+                      <LabelArea label={t("Hide Stock ")} />
+                      <div className="col-span-8 sm:col-span-4">
+                        <ShowHideButton status={true} />
+
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+
+                <div>
+                  <div className="bg-white shadow-md p-4 mb-8">
+                    <div className="w-full relative pb- mb-6 border-b border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
+                      <Title
+                        register={register}
+
+                        title={t("Cash on delivery")}
+                      />
+                    </div>
+                    <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+                      <LabelArea label={t("Status ")} />
+                      <div className="col-span-8 sm:col-span-4">
+                        <ShowHideButton status={true} />
+
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+
+                <div>
+                  <div className="bg-white shadow-md p-4 mb-8">
+                    <div className="w-full relative pb- mb-6 border-b border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
+                      <Title
+                        register={register}
+
+                        title={t("Featured")}
+                      />
+                    </div>
+                    <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+                      <LabelArea label={t("Status ")} />
+                      <div className="col-span-8 sm:col-span-4">
+                        <ShowHideButton status={true} />
+
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+
+
+                <div>
+                  <div className="bg-white shadow-md p-4 mb-8">
+                    <div className="w-full relative pb- mb-6 border-b border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
+                      <Title
+                        register={register}
+
+                        title={t("Today Deal")}
+                      />
+                    </div>
+                    <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+                      <LabelArea label={t("Status ")} />
+                      <div className="col-span-8 sm:col-span-4">
+                        <ShowHideButton status={true} />
+
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+
+
+
+                <div>
+                  <div className="bg-white shadow-md p-4 mb-8">
+                    <div className="w-full relative pb- mb-6 border-b border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
+                      <Title
+                        register={register}
+
+                        title={t("Flash Deal")}
+                      />
+                    </div>
+                    <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+                      <LabelArea label={t("Add to Flash  ")} />
+                      <div className="col-span-8 sm:col-span-4">
+                        <RSelect
+                          options={options}
+                        >
+
+                        </RSelect>
+
+                      </div>
+                    </div>
+
+
+                    <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+                      <LabelArea label={t("Discount  ")} />
+                      <div className="col-span-8 sm:col-span-4">
+                        <InputArea
+                          register={register}
+                          label="Name"
+                          name="name"
+                          type="number"
+                          placeholder='0'
+
+                        />
+
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+                      <LabelArea label={t("Discount Type  ")} />
+                      <div className="col-span-8 sm:col-span-4">
+                        <RSelect
+                          options={options}
+                        >
+
+                        </RSelect>
+
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+
+                <div className="bg-white shadow-md p-4 mb-8">
+                  <div className="w-full relative pb- mb-6 border-b border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
+                    <Title
+                      register={register}
+
+                      title={t("Estimate Shipping Time")}
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+                    <LabelArea label={t("Shipping Days  ")} />
+                    <div className="col-span-8 sm:col-span-4">
+                      <InputArea
+                        register={register}
+                        label="Name"
+                        name="name"
+                        type="text"
+                        placeholder='Shipping Days'
+
+                      />
+
+                    </div>
+                  </div>
+
+                </div>
+
+                <div className="bg-white shadow-md p-4 mb-8">
+                  <div className="w-full relative pb- mb-6 border-b border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
+                    <Title
+                      register={register}
+
+                      title={t("Vat & tax")}
+                    />
+                  </div>
+
+                  <div className="mb-6">
+                    <div className="mb-1">
+                      <LabelArea label={t("tax  ")} className="block" />
+                    </div>
+                    <div className="flex items-center -mx-1">
+                      <div className="w-1/2 px-1">
+                        <InputArea
+                          register={register}
+                          label="Name"
+                          name="name"
+                          type="number"
+                          placeholder='0'
+
+                        />
+                      </div>
+                      <div className="w-1/2 px-1">
+                        <RSelect
+                          options={options}
+
+                        >
+
+                        </RSelect>
+
+                      </div>
+                    </div>
+                  </div>
+
+
+                  <div className="mb-6">
+                    <div className="mb-1">
+                      <LabelArea label={t("vat ")} />
+                    </div>
+                    <div className="flex items-center -mx-1">
+                      <div className="w-1/2 px-1">
+                        <InputArea
+                          register={register}
+                          label="Name"
+                          name="name"
+                          type="number"
+                          placeholder='0'
+
+                        />
+                      </div>
+                      <div className="w-1/2 px-1">
+                        <RSelect
+                          options={options}
+
+                          >
+                          </RSelect>
+                      </div>
+                    </div>
+                  </div>
+
+
+              {/* </div>
+            </div> */}
+                </div>
+
+
+        <div>
+          {/* <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
                 <LabelArea label={t("ProductImage")} />
                 <div className="col-span-8 sm:col-span-4">
                   <Uploader
@@ -211,292 +1012,302 @@ const ProductDrawer = ({ id }) => {
                     setImageUrl={setImageUrl}
                   />
                 </div>
-              </div>
+              </div> */}
+        </div>
 
-              <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
-                <LabelArea label={t("ProductSKU")} />
-                <div className="col-span-8 sm:col-span-4">
-                  <InputArea
-                    register={register}
-                    required="false"
-                    label={t("ProductSKU")}
-                    name="sku"
-                    type="text"
-                    placeholder={t("ProductSKU")}
-                  />
-                  <Error errorName={errors.sku} />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
-                <LabelArea label={t("ProductBarcode")} />
-                <div className="col-span-8 sm:col-span-4">
-                  <InputArea
-                    register={register}
-                    required="false"
-                    label={t("ProductBarcode")}
-                    name="barcode"
-                    type="text"
-                    placeholder={t("ProductBarcode")}
-                  />
-                  <Error errorName={errors.barcode} />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
-                <LabelArea label={t("Category")} />
-                <div className="col-span-8 sm:col-span-4">
-                  <ParentCategory
-                    lang={language}
-                    selectedCategory={selectedCategory}
-                    setSelectedCategory={setSelectedCategory}
-                    setDefaultCategory={setDefaultCategory}
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
-                <LabelArea label={t("DefaultCategory")} />
-                <div className="col-span-8 sm:col-span-4">
-                  <Multiselect
-                    displayValue="name"
-                    isObject={true}
-                    singleSelect={true}
-                    ref={resetRefTwo}
-                    hidePlaceholder={true}
-                    onKeyPressFn={function noRefCheck() { }}
-                    onRemove={function noRefCheck() { }}
-                    onSearch={function noRefCheck() { }}
-                    onSelect={(v) => setDefaultCategory(v)}
-                    selectedValues={defaultCategory}
-                    options={selectedCategory}
-                    placeholder={"Default Category"}
-                  ></Multiselect>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
-                <LabelArea label="Product Price" />
-                <div className="col-span-8 sm:col-span-4">
-                  <InputValue
-                    register={register}
-                    maxValue={2000}
-                    minValue={1}
-                    label="Original Price"
-                    name="originalPrice"
-                    type="number"
-                    placeholder="OriginalPrice"
-                    defaultValue={0.0}
-                    required="false"
-                    product
-                    currency={currency}
-                  />
-                  <Error errorName={errors.originalPrice} />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
-                <LabelArea label={t("SalePrice")} />
-                <div className="col-span-8 sm:col-span-4">
-                  <InputValue
-                    product
-                    register={register}
-                    minValue={0}
-                    defaultValue={0.0}
-                    required="false"
-                    label="Sale price"
-                    name="price"
-                    type="number"
-                    placeholder="Sale price"
-                    currency={currency}
-                  />
-                  <Error errorName={errors.price} />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6 relative">
-                <LabelArea label={t("ProductQuantity")} />
-                <div className="col-span-8 sm:col-span-4">
-                  <InputValueFive
-                    register={register}
-                    minValue={0}
-                    defaultValue={0}
-                    label="Quantity"
-                    name="stock"
-                    type="number"
-                    placeholder={t("ProductQuantity")}
-                  />
-                  <Error errorName={errors.stock} />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
-                <LabelArea label={t("ProductSlug")} />
-                <div className="col-span-8 sm:col-span-4">
-                  <Input
-                    {...register(`slug`, {
-                      required: "slug is required!",
-                    })}
-                    className="border h-12 text-sm focus:outline-none block w-full bg-gray-100 dark:bg-white border-transparent focus:bg-white"
-                    name="slug"
-                    type="text"
-                    defaultValue={slug}
-                    placeholder={t("ProductSlug")}
-                    onBlur={(e) => handleProductSlug(e.target.value)}
-                  />
-                  <Error errorName={errors.slug} />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
-                <LabelArea label={t("ProductTag")} />
-                <div className="col-span-8 sm:col-span-4">
-                  <ReactTagInput
-                    placeholder={t("ProductTagPlaseholder")}
-                    tags={tag}
-                    onChange={(newTags) => setTag(newTags)}
-                  />
-                </div>
-              </div>
-
-            </div>
-          )}
-
-          {tapValue === "Combination" &&
-            isCombination &&
-            (attribue.length < 1 ? (
-              <div
-                className="bg-teal-100 border border-teal-600 rounded-md text-teal-900 px-4 py-3 m-4"
-                role="alert"
-              >
-                <div className="flex">
-                  <div className="py-1">
-                    <svg
-                      className="fill-current h-6 w-6 text-teal-500 mr-4"
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 20 20"
-                    >
-                      <path d="M2.93 17.07A10 10 0 1 1 17.07 2.93 10 10 0 0 1 2.93 17.07zm12.73-1.41A8 8 0 1 0 4.34 4.34a8 8 0 0 0 11.32 11.32zM9 11V9h2v6H9v-4zm0-6h2v2H9V5z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <p className="text-sm">
-                      {t("AddCombinationsDiscription")}{" "}
-                      <Link to="/attributes" className="font-bold">
-                        {t("AttributesFeatures")}
-                      </Link>
-                      {t("AddCombinationsDiscriptionTwo")}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="p-6">
-                {/* <h4 className="mb-4 font-semibold text-lg">Variants</h4> */}
-                <div className="grid md:grid-cols-4 sm:grid-cols-2 grid-cols-1 gap-3 md:gap-3 xl:gap-3 lg:gap-2 mb-3">
-                  <MultiSelect
-                    options={attTitle}
-                    value={attributes}
-                    onChange={(v) => handleAddAtt(v)}
-                    labelledBy="Select"
-                  />
-
-                  {attributes?.map((attribute, i) => (
-                    <div key={attribute._id}>
-                      <div className="flex w-full h-10 justify-between font-sans rounded-tl rounded-tr bg-gray-200 px-4 py-3 text-left text-sm font-normal text-gray-700 hover:bg-gray-200 focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75">
-                        {"Select"}
-                        {showingTranslateValue(attribute?.title, language)}
-                      </div>
-
-                      <AttributeOptionTwo
-                        id={i + 1}
-                        values={values}
-                        lang={language}
-                        attributes={attribute}
-                        setValues={setValues}
-                      />
-                    </div>
-                  ))}
-                </div>
-
-                <div className="flex justify-end mb-6">
-                  {attributes?.length > 0 && (
-                    <Button
-                      onClick={handleGenerateCombination}
-                      type="button"
-                      className="mx-2"
-                    >
-                      <span className="text-xs">{t("GenerateVariants")}</span>
-                    </Button>
-                  )}
-
-                  {variantTitle.length > 0 && (
-                    <Button onClick={handleClearVariant} className="mx-2">
-                      <span className="text-xs">{t("ClearVariants")}</span>
-                    </Button>
-                  )}
-                </div>
-              </div>
-            ))}
-
-          {isCombination ? (
-            <DrawerButton
-              id={id}
-              save
-              title="Product"
-              isSubmitting={isSubmitting}
-              handleProductTap={handleProductTap}
-            />
-          ) : (
-            <DrawerButton id={id} title="Product" isSubmitting={isSubmitting} />
-          )}
-
-          {tapValue === "Combination" && (
-            <DrawerButton id={id} title="Product" isSubmitting={isSubmitting} />
-          )}
-        </form>
-
-        {tapValue === "Combination" &&
-          isCombination &&
-          variantTitle.length > 0 && (
-            <div className="px-6">
-              {/* {variants?.length >= 0 && ( */}
-              {isCombination && (
-                <TableContainer className="md:mb-32 mb-40 rounded-b-lg">
-                  <Table>
-                    <TableHeader>
-                      <tr>
-                        <TableCell>{t("Image")}</TableCell>
-                        <TableCell>{t("Combination")}</TableCell>
-                        <TableCell>{t("Sku")}</TableCell>
-                        <TableCell>{t("Barcode")}</TableCell>
-                        <TableCell>{t("Price")}</TableCell>
-                        <TableCell>{t("SalePrice")}</TableCell>
-                        <TableCell>{t("QuantityTbl")}</TableCell>
-                        <TableCell className="text-right">
-                          {t("Action")}
-                        </TableCell>
-                      </tr>
-                    </TableHeader>
-
-                    <AttributeListTable
-                      lang={language}
-                      variants={variants}
-                      setTapValue={setTapValue}
-                      variantTitle={variantTitle}
-                      isBulkUpdate={isBulkUpdate}
-                      handleSkuBarcode={handleSkuBarcode}
-                      handleEditVariant={handleEditVariant}
-                      handleRemoveVariant={handleRemoveVariant}
-                      handleQuantityPrice={handleQuantityPrice}
-                      handleSelectInlineImage={handleSelectInlineImage}
+        {/* <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+                  <LabelArea label={t("ProductSKU")} />
+                  <div className="col-span-8 sm:col-span-4">
+                    <InputArea
+                      register={register}
+                      required="false"
+                      label={t("ProductSKU")}
+                      name="sku"
+                      type="text"
+                      placeholder={t("ProductSKU")}
                     />
-                  </Table>
-                </TableContainer>
-              )}
-            </div>
+                    <Error errorName={errors.sku} />
+                  </div>
+                </div> */}
+
+        <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+          {/* <LabelArea label={t("ProductBarcode")} />
+                  <div className="col-span-8 sm:col-span-4">
+                    <InputArea
+                      register={register}
+                      required="false"
+                      label={t("ProductBarcode")}
+                      name="barcode"
+                      type="text"
+                      placeholder={t("ProductBarcode")}
+                    />
+                    <Error errorName={errors.barcode} />
+                  </div> */}
+        </div>
+
+        <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+          {/* <LabelArea label={t("Category")} />
+                  <div className="col-span-8 sm:col-span-4">
+                    <ParentCategory
+                      lang={language}
+                      selectedCategory={selectedCategory}
+                      setSelectedCategory={setSelectedCategory}
+                      setDefaultCategory={setDefaultCategory}
+                    />
+                  </div> */}
+        </div>
+
+        <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+          <LabelArea label={t("DefaultCategory")} />
+          <div className="col-span-8 sm:col-span-4">
+            <Multiselect
+              displayValue="name"
+              isObject={true}
+              singleSelect={true}
+              ref={resetRefTwo}
+              hidePlaceholder={true}
+              onKeyPressFn={function noRefCheck() { }}
+              onRemove={function noRefCheck() { }}
+              onSearch={function noRefCheck() { }}
+              onSelect={(v) => setDefaultCategory(v)}
+              selectedValues={defaultCategory}
+              options={selectedCategory}
+              placeholder={"Default Category"}
+            ></Multiselect>
+          </div>
+        </div>
+
+        {/* <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+                  <LabelArea label="Product Price" />
+                  <div className="col-span-8 sm:col-span-4">
+                    <InputValue
+                      register={register}
+                      maxValue={2000}
+                      minValue={1}
+                      label="Original Price"
+                      name="originalPrice"
+                      type="number"
+                      placeholder="OriginalPrice"
+                      defaultValue={0.0}
+                      required="false"
+                      product
+                      currency={currency}
+                    />
+                    <Error errorName={errors.originalPrice} />
+                  </div>
+                </div> */}
+        {/* 
+                <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+                  <LabelArea label={t("SalePrice")} />
+                  <div className="col-span-8 sm:col-span-4">
+                    <InputValue
+                      product
+                      register={register}
+                      minValue={0}
+                      defaultValue={0.0}
+                      required="false"
+                      label="Sale price"
+                      name="price"
+                      type="number"
+                      placeholder="Sale price"
+                      currency={currency}
+                    />
+                    <Error errorName={errors.price} />
+                  </div>
+                </div> */}
+
+        {/* <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6 relative">
+                  <LabelArea label={t("ProductQuantity")} />
+                  <div className="col-span-8 sm:col-span-4">
+                    <InputValueFive
+                      register={register}
+                      minValue={0}
+                      defaultValue={0}
+                      label="Quantity"
+                      name="stock"
+                      type="number"
+                      placeholder={t("ProductQuantity")}
+                    />
+                    <Error errorName={errors.stock} />
+                  </div>
+                </div> */}
+
+        {/* <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+                  <LabelArea label={t("ProductSlug")} />
+                  <div className="col-span-8 sm:col-span-4">
+                    <Input
+                      {...register(`slug`, {
+                        required: "slug is required!",
+                      })}
+                      className="border h-12 text-sm focus:outline-none block w-full bg-gray-100 dark:bg-white border-transparent focus:bg-white"
+                      name="slug"
+                      type="text"
+                      defaultValue={slug}
+                      placeholder={t("ProductSlug")}
+                      onBlur={(e) => handleProductSlug(e.target.value)}
+                    />
+                    <Error errorName={errors.slug} />
+                  </div>
+                </div> */}
+
+        {/* <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+                  <LabelArea label={t("ProductTag")} />
+                  <div className="col-span-8 sm:col-span-4">
+                    <ReactTagInput
+                      placeholder={t("ProductTagPlaseholder")}
+                      tags={tag}
+                      onChange={(newTags) => setTag(newTags)}
+                    />
+                  </div>
+                </div> */}
+
+
+      </div>
+
+    </div >
           )}
-      </Scrollbars>
+
+{
+  tapValue === "Combination" &&
+  isCombination &&
+  (attribue.length < 1 ? (
+    <div
+      className="bg-teal-100 border border-teal-600 rounded-md text-teal-900 px-4 py-3 m-4"
+      role="alert"
+    >
+      <div className="flex">
+        <div className="py-1">
+          <svg
+            className="fill-current h-6 w-6 text-teal-500 mr-4"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 20 20"
+          >
+            <path d="M2.93 17.07A10 10 0 1 1 17.07 2.93 10 10 0 0 1 2.93 17.07zm12.73-1.41A8 8 0 1 0 4.34 4.34a8 8 0 0 0 11.32 11.32zM9 11V9h2v6H9v-4zm0-6h2v2H9V5z" />
+          </svg>
+        </div>
+        <div>
+          <p className="text-sm">
+            {t("AddCombinationsDiscription")}{" "}
+            <Link to="/attributes" className="font-bold">
+              {t("AttributesFeatures")}
+            </Link>
+            {t("AddCombinationsDiscriptionTwo")}
+          </p>
+        </div>
+      </div>
+    </div>
+  ) : (
+    <div className="p-6">
+      {/* <h4 className="mb-4 font-semibold text-lg">Variants</h4> */}
+      <div className="grid md:grid-cols-4 sm:grid-cols-2 grid-cols-1 gap-3 md:gap-3 xl:gap-3 lg:gap-2 mb-3">
+        <MultiSelect
+          options={attTitle}
+          value={attributes}
+          onChange={(v) => handleAddAtt(v)}
+          labelledBy="Select"
+        />
+
+        {attributes?.map((attribute, i) => (
+          <div key={attribute._id}>
+            <div className="flex w-full h-10 justify-between font-sans rounded-tl rounded-tr bg-gray-200 px-4 py-3 text-left text-sm font-normal text-gray-700 hover:bg-gray-200 focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75">
+              {"Select"}
+              {showingTranslateValue(attribute?.title, language)}
+            </div>
+
+            <AttributeOptionTwo
+              id={i + 1}
+              values={values}
+              lang={language}
+              attributes={attribute}
+              setValues={setValues}
+            />
+          </div>
+        ))}
+      </div>
+
+      <div className="flex justify-end mb-6">
+        {attributes?.length > 0 && (
+          <Button
+            onClick={handleGenerateCombination}
+            type="button"
+            className="mx-2"
+          >
+            <span className="text-xs">{t("GenerateVariants")}</span>
+          </Button>
+        )}
+
+        {variantTitle.length > 0 && (
+          <Button onClick={handleClearVariant} className="mx-2">
+            <span className="text-xs">{t("ClearVariants")}</span>
+          </Button>
+        )}
+      </div>
+    </div>
+  ))
+}
+
+{
+  isCombination ? (
+    <DrawerButton
+      id={id}
+      save
+      title="Product"
+      isSubmitting={isSubmitting}
+      handleProductTap={handleProductTap}
+    />
+  ) : (
+    <DrawerButton id={id} title="Product" isSubmitting={isSubmitting} />
+  )
+}
+
+{
+  tapValue === "Combination" && (
+    <DrawerButton id={id} title="Product" isSubmitting={isSubmitting} />
+  )
+}
+        </form >
+
+  { tapValue === "Combination" &&
+  isCombination &&
+  variantTitle.length > 0 && (
+    <div className="px-6">
+      {/* {variants?.length >= 0 && ( */}
+      {isCombination && (
+        <TableContainer className="md:mb-32 mb-40 rounded-b-lg">
+          <Table>
+            <TableHeader>
+              <tr>
+                <TableCell>{t("Image")}</TableCell>
+                <TableCell>{t("Combination")}</TableCell>
+                <TableCell>{t("Sku")}</TableCell>
+                <TableCell>{t("Barcode")}</TableCell>
+                <TableCell>{t("Price")}</TableCell>
+                <TableCell>{t("SalePrice")}</TableCell>
+                <TableCell>{t("QuantityTbl")}</TableCell>
+                <TableCell className="text-right">
+                  {t("Action")}
+                </TableCell>
+              </tr>
+            </TableHeader>
+
+            <AttributeListTable
+              lang={language}
+              variants={variants}
+              setTapValue={setTapValue}
+              variantTitle={variantTitle}
+              isBulkUpdate={isBulkUpdate}
+              handleSkuBarcode={handleSkuBarcode}
+              handleEditVariant={handleEditVariant}
+              handleRemoveVariant={handleRemoveVariant}
+              handleQuantityPrice={handleQuantityPrice}
+              handleSelectInlineImage={handleSelectInlineImage}
+            />
+          </Table>
+        </TableContainer>
+      )}
+    </div>
+  )}
+      </Scrollbars >
     </>
   );
 };

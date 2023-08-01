@@ -80,7 +80,7 @@ const DiscountDetails = () => {
         </CardBody>
       </Card>
 
-      {!loading && discountdata.length=== 0 && (
+      {!loading && discountdata.length=== 0 && ( 
         <NotFound title="Discount Details page not found" />
       )}
     </div>
