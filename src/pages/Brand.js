@@ -33,6 +33,8 @@ import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import PageTitle from "components/Typography/PageTitle";
 import BrandDrawer from "components/drawer/BrandDrawer";
+import BrandTable from "components/Brand/BrandTable";
+import useBrandSubmit from "hooks/useBrandSubmit";
 const Brand = ({id}) => {
   const { title, allId, serviceId, handleDeleteMany, handleUpdateMany } =
     useToggleDrawer();
@@ -55,6 +57,15 @@ const Brand = ({id}) => {
     isUpdate
 
   } = useContext(SidebarContext);
+
+
+  
+  const {
+    brandData,
+    setBrandData
+  } = useBrandSubmit(id);
+
+  console.log(brandData,"js")
 
 const [add,setAdd]=useState(false)
 const [update,setUpdate]=useState(false)
@@ -110,6 +121,9 @@ useEffect(() => {
  
   const ID = useSelector((state) => state.id)
   console.log("🚀 ~ file: UserDiscount.js:111 ~ UserDiscount ~ ID:", ID)
+
+
+  
 
   return (
     <>
@@ -188,11 +202,11 @@ useEffect(() => {
                   <TableCell> SLUG</TableCell>
                 </tr>
               </TableHeader>
-              <DiscountTable data={resp} />
+              <BrandTable data={brandData} />
             </Table>
             <TableFooter>
               <Pagination
-                totalResults={resp?.totalDoc}
+                totalResults={brandData?.totalDoc}
                 resultsPerPage={limitData}
                 onChange={handleChangePage}
                 label="Discount page Navigation"

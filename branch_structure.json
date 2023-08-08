@@ -1,0 +1,24 @@
+{
+  "default_branch": "main",
+  "branches": [
+    "admin",
+    "mahboob-dev",
+    "main",
+    "origin",
+    "zubair-dev"
+  ],
+  "parent": {
+    "admin": "main",
+    "mahboob-dev": "main",
+    "main": null,
+    "origin": "main",
+    "zubair-dev": "main"
+  },
+  "order": [
+    "main",
+    "admin",
+    "mahboob-dev",
+    "origin",
+    "zubair-dev"
+  ]
+}
