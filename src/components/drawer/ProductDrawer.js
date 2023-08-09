@@ -46,7 +46,6 @@ import CategoryServices from "services/CategoryServices";
 const ProductDrawer = ({ id }) => {
   const { t } = useTranslation();
 
-
   const {
     tag,
     setTag,
@@ -98,8 +97,7 @@ const ProductDrawer = ({ id }) => {
     setweight,
     barcode,
     setBarcode,
-    selectedBrand,
-    setSelectedBrand,
+
     selectedUnit,
     setSelectedUnit,
     thumbnailImage,
@@ -126,80 +124,89 @@ const ProductDrawer = ({ id }) => {
     setMetaTitle,
     metaImage,
     setMetaImage,
-    pdfSpecification,
-    setPdfSpecification,
+
     category,
     setCategory,
     isPublished,
     setisPublished,
     isFeatured,
-    setIsFeatured
+    setIsFeatured,
+
+    //
+    pdfSpecification,
+    setPdfSpecification,
+    selectedSingleCategory,
+    setselectedSingleCategory,
+    selectedBrand,
+    setSelectedBrand,
+    setValue,
+    tags,
+    handleKeyPress,
+    tagInput,
+    setTagInput,
   } = useProductSubmit(id);
 
-  console.log(minimumPurchaseQuantity, "5")
   const currency = globalSetting?.default_currency || "$";
 
   const options = [
-    { value: 'chocolate', label: 'Chocolate' },
-    { value: 'strawberry', label: 'Strawberry' },
-    { value: 'vanilla', label: 'Vanilla' },
+    { value: "chocolate", label: "Chocolate" },
+    { value: "strawberry", label: "Strawberry" },
+    { value: "vanilla", label: "Vanilla" },
   ];
-  const [unit, setUnit] = useState([])
+  const [unit, setUnit] = useState([]);
   // const [selectedUnit, setSelectedUnit] = useState(null)
   useEffect(() => {
-
     const fetchData = async () => {
       const data = await ProductServices.getUnit();
-      setUnit(data)
-    }
-    fetchData()
-      .catch(console.error);
-  }, [])
+      setUnit(data);
+    };
+    fetchData().catch(console.error);
+  }, []);
 
-  const Unitdata = Array.isArray(unit) ? unit.map((item) => ({ label: item.name })) : [];
-
+  const Unitdata = Array.isArray(unit)
+    ? unit.map((item) => ({ label: item.name }))
+    : [];
 
   const handleUnitChange = (selectedOption) => {
     setSelectedUnit(selectedOption);
+    setValue("unit", selectedOption.label);
   };
 
-  const [brand, setBrand] = useState([])
+  const [brand, setBrand] = useState([]);
   //const [selectedBrand, setSelectedBrand] = useState(null)
   useEffect(() => {
-
     const fetchData = async () => {
       const data = await ProductServices.getBrand();
-      setBrand(data)
-    }
-    fetchData()
-      .catch(console.error);
-  }, [])
+      setBrand(data);
+    };
+    fetchData().catch(console.error);
+  }, []);
 
-  const Brand = Array.isArray(brand) ? brand.map((item) => ({ value: item._id, label: item.name })) : [];
-  console.log(Brand, "brand")
+  const Brand = Array.isArray(brand)
+    ? brand.map((item) => ({ value: item._id, label: item.name }))
+    : [];
+  console.log(Brand, "brand");
 
-  const handleBrandChange = (selectedOption) => {
-    setSelectedBrand(selectedOption);
-  };
-
- 
   useEffect(() => {
     const fetchData = async () => {
       const data = await CategoryServices.getAllCategory();
-      setCategory(data)
-      console.log(data,"dat")
+      setCategory(data);
+      console.log(data, "dat");
+    };
+    fetchData().catch(console.error);
+  }, []);
 
-    }
-    fetchData()
-    .catch(console.error);
-
-  }, [])
-
-  const getcategory = Array.isArray(category) ? category.map((item) => ({ value: item._id, label: item.name.en })) : [];
- 
+  const getcategory = Array.isArray(category)
+    ? category.map((item) => ({ value: item._id, label: item.name.en }))
+    : [];
   const handleCategoryChange = (getcategory) => {
-    setCategory(getcategory.value);
-    console.log(getcategory,"selectedOption")
+    setselectedSingleCategory(getcategory);
+    setValue("category", getcategory.value);
+  };
+
+  const handleBrandChange = (selectedOption) => {
+    setValue("brand", selectedOption?.label);
+    setSelectedBrand(selectedOption);
   };
 
   return (
@@ -229,14 +236,14 @@ const ProductDrawer = ({ id }) => {
             register={register}
             //handleSelectLanguage={handleSelectLanguage}
             title={t("UpdateProduct")}
-          //  description={t("UpdateProductDescription")}
+            //  description={t("UpdateProductDescription")}
           />
         ) : (
           <Title
             register={register}
             //handleSelectLanguage={handleSelectLanguage}
             title={t("Add new Product")}
-          // description={t("AddProductDescription")}
+            // description={t("AddProductDescription")}
           />
         )}
       </div>
@@ -290,34 +297,23 @@ const ProductDrawer = ({ id }) => {
                         name="title"
                         type="text"
                         placeholder={t("Product Name")}
-                        onBlur={(e) => handleProductSlug(e.target.value)}
+                        // onBlur={(e) => handleProductSlug(e.target.value)}
                       />
                       <Error errorName={errors.title} />
                     </div>
                   </div>
-
                   <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
                     <LabelArea label={t("Category*")} />
                     <div className="col-span-8 sm:col-span-4">
                       <RSelect
                         options={getcategory}
                         placeholder=" Select Category"
-                        value={category}
+                        value={selectedSingleCategory}
                         onChange={handleCategoryChange}
                         isClearable
-                      // onChange={(e) => {
-                      //   formik?.setFieldValue("categoryId", e);
-                      // }}
-                      // error={formik?.errors?.categoryId}
-                      // touched={formik?.touched?.categoryId}
-                      // onBlur={formik?.handleBlur}
-                      // value={formik?.values?.categoryId}
-                      // name="category"
-                      // id="category"
                       ></RSelect>
                     </div>
                   </div>
-
 
                   <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
                     <LabelArea label={t("Brand")} />
@@ -328,19 +324,466 @@ const ProductDrawer = ({ id }) => {
                         value={selectedBrand}
                         onChange={handleBrandChange}
                         isClearable
-                      // onChange={(e) => {
-                      //   formik?.setFieldValue("categoryId", e);
-                      // }}
-                      // error={formik?.errors?.categoryId}
-                      // touched={formik?.touched?.categoryId}
-                      // onBlur={formik?.handleBlur}
-                      // value={formik?.values?.categoryId}
-                      // name="category"
-                      // id="category"
+                        // onChange={(e) => {
+                        //   formik?.setFieldValue("categoryId", e);
+                        // }}
+                        // error={formik?.errors?.categoryId}
+                        // touched={formik?.touched?.categoryId}
+                        // onBlur={formik?.handleBlur}
+                        // value={formik?.values?.categoryId}
+                        // name="category"
+                        // id="category"
                       ></RSelect>
                     </div>
                   </div>
+                  <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+                    <LabelArea label="Unit" />
+                    <div className="col-span-8 sm:col-span-4">
+                      <RSelect
+                        options={Unitdata}
+                        placeholder="Select Unit"
+                        value={selectedUnit}
+                        onChange={handleUnitChange}
+                        isClearable
+                        // onChange={(e) => {
+                        //   setUnit("unit", e);
+                        // }}
+                        // error={formik?.errors?.categoryId}
+                        // touched={formik?.touched?.categoryId}
+                        // onBlur={formik?.handleBlur}
+                        // value={formik?.values?.categoryId}
+                        // name="category"
+                        // id="category"
+                      ></RSelect>
+                      <Error errorName={errors.name} />
+                    </div>
+                  </div>
+                  {/* <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+                    <LabelArea label={t("unit*")} />
+                    <div className="col-span-8 sm:col-span-4">
+                      <Input
+                        {...register(`unit`, {
+                          required: "Unit is required!",
+                        })}
+                        className="border h-12 text-sm focus:outline-none block w-full bg-gray-100 dark:bg-white border-transparent focus:bg-white"
+                        name="unit"
+                        type="text"
+                        placeholder={t("Unit (e.g. KG, Pc etc")}
+                        // onBlur={(e) => handleProductSlug(e.target.value)}
+                      />
+                      <Error errorName={errors.unit} />
+                    </div>
+                  </div> */}
+                  <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+                    <LabelArea label={t("Weight (in kg)*")} />
+                    <div className="col-span-8 sm:col-span-4">
+                      <Input
+                        {...register(`weight`, {
+                          required: "Weight is required!",
+                        })}
+                        className="border h-12 text-sm focus:outline-none block w-full bg-gray-100 dark:bg-white border-transparent focus:bg-white"
+                        name="weight"
+                        type="number"
+                        placeholder={t("0.00")}
+                        // onBlur={(e) => handleProductSlug(e.target.value)}
+                      />
+                      <Error errorName={errors.unit} />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+                    <LabelArea label={t("Minimum Purchase Quantity")} />
+                    <div className="col-span-8 sm:col-span-4">
+                      <Input
+                        {...register(`minimumPurchaseQuantity`, {
+                          required: "Minimum Purchase Quantity is required!",
+                        })}
+                        className="border h-12 text-sm focus:outline-none block w-full bg-gray-100 dark:bg-white border-transparent focus:bg-white"
+                        name="minimumPurchaseQuantity"
+                        type="number"
+                        placeholder={t("1")}
+                        // onBlur={(e) => handleProductSlug(e.target.value)}
+                      />
+                      <Error errorName={errors.minimumPurchaseQuantity} />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+                    <LabelArea label={t("Tag")} />
+                    <div className="col-span-8 sm:col-span-4">
+                      <Input
+                        // {...register("tag", {
+                        //   required: false,
+                        // })}
+                        className="border h-12 text-sm focus:outline-none block w-full bg-gray-100 dark:bg-white border-transparent focus:bg-white"
+                        name="tag"
+                        type="text"
+                        placeholder={t("Type and hit enter to add a tag")}
+                        value={tagInput}
+                        onChange={(e) => setTagInput(e.target.value)}
+                        onKeyPress={handleKeyPress}
+                      />
+                      {/* <Error errorName={errors.tag} /> */}
+                      <div>
+                        {tags.length != 0 ? (
+                          tags.map((tag, index) => (
+                            <span
+                              key={index}
+                              className="inline-block bg-blue-500 text-white px-2 py-1 rounded-full mr-2 mt-2"
+                            >
+                              {tag}
+                            </span>
+                          ))
+                        ) : (
+                          <span>
+                            This is used for search. Input those word by which
+                            customer can find this product.
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+                    <LabelArea label={t("Bar code*")} />
+                    <div className="col-span-8 sm:col-span-4">
+                      <Input
+                        {...register(`barcode`, {
+                          required: "bar code is required!",
+                        })}
+                        className="border h-12 text-sm focus:outline-none block w-full bg-gray-100 dark:bg-white border-transparent focus:bg-white"
+                        name="barcode"
+                        type="text"
+                        placeholder={t("barcode")}
+                        // onBlur={(e) => handleProductSlug(e.target.value)}
+                      />
+                      <Error errorName={errors.barcode} />
+                    </div>
+                  </div>
 
+                  <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+                    <LabelArea label="Description*" />
+                    <div className="col-span-8 sm:col-span-4">
+                      <InputArea
+                        register={register}
+                        label="description"
+                        name="description"
+                        type="2"
+                        placeholder="Description"
+                      />
+                      <span>
+                        This is use for search input those words by which
+                        customer can find this product
+                      </span>
+                      <Error errorName={errors.name} />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+                    <LabelArea label={t("Slug*")} />
+                    <div className="col-span-8 sm:col-span-4">
+                      <Input
+                        {...register(`slug`, {
+                          required: "Slug is required!",
+                        })}
+                        className="border h-12 text-sm focus:outline-none block w-full bg-gray-100 dark:bg-white border-transparent focus:bg-white"
+                        name="slug"
+                        type="text"
+                        placeholder={t("slug")}
+                        // onBlur={(e) => handleProductSlug(e.target.value)}
+                      />
+                      <Error errorName={errors.slug} />
+                    </div>
+                  </div>
+                  {/* <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+                    <LabelArea label={t("Stock*")} />
+                    <div className="col-span-8 sm:col-span-4">
+                      <Input
+                        {...register(`stock`, {
+                          required: "Stock is required!",
+                        })}
+                        className="border h-12 text-sm focus:outline-none block w-full bg-gray-100 dark:bg-white border-transparent focus:bg-white"
+                        name="stock"
+                        type="number"
+                        placeholder={t("stock")}
+                        // onBlur={(e) => handleProductSlug(e.target.value)}
+                      />
+                      <Error errorName={errors.stock} />
+                    </div>
+                  </div> */}
+
+                  <div className="w-full relative pb-2 mb-6 border-b border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
+                    <Title title={t("Product Image")} />
+                  </div>
+
+                  <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+                    <LabelArea label={t("Gallery Image (500x500)")} />
+                    <div className="col-span-8 sm:col-span-4">
+                      <div className=" border-gray">
+                        <div className="p-2 inline-block">
+                          <Uploader
+                            product
+                            folder="product"
+                            imageUrl={imageUrl}
+                            setImageUrl={setImageUrl}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+                    <LabelArea label={t("Thumbnail Image (300x300)")} />
+                    <div className="col-span-8 sm:col-span-4">
+                      <div className=" border-gray">
+                        <div className="p-2 inline-block">
+                          <Uploader
+                            folder="product"
+                            imageUrl={thumbnailImage}
+                            setImageUrl={setThumbnailImage}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="w-full relative pb-2 mb-6 border-b border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
+                    <Title title={t("Product Video")} />
+                  </div>
+                  <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+                    <LabelArea label={t("Video Provider")} />
+                    <div className="col-span-8 sm:col-span-4">
+                      <InputArea
+                        register={register}
+                        required="false"
+                        name="videoProvide"
+                        type="text"
+                        placeholder="YouTube"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+                    <LabelArea label={t("Video Link")} />
+                    <div className="col-span-8 sm:col-span-4">
+                      <InputArea
+                        register={register}
+                        required="false"
+                        name="videoLink"
+                        type="text"
+                        placeholder="Video Link"
+                      />
+                      <span>
+                        use proper link without extra paramater.Dont use short
+                        share link/embeded iframe code
+                      </span>
+                    </div>
+                  </div>
+                  <div className="w-full relative pb- mb-6 border-b border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
+                    <Title title={t("Product price + stock")} />
+                  </div>
+                  <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+                    <LabelArea label={t("Unit price*")} />
+                    <div className="col-span-8 sm:col-span-4">
+                      <InputArea
+                        register={register}
+                        label="unitPrice"
+                        name="unitPrice"
+                        type="number"
+                        placeholder="0"
+                      />
+                      <Error errorName={errors.unitPrice} />
+                    </div>
+                  </div>
+
+                  {/* <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+                    <LabelArea label={t("Discount data Range")} />
+                    <div className="col-span-8 sm:col-span-4">
+                      <InputArea
+                        register={register}
+                        required="false"
+                        label="discount"
+                        name="discount"
+                        type="text"
+                        placeholder="Select data Range"
+                      />
+                    </div>
+                  </div> */}
+
+                  <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+                    <LabelArea label={t("Discount")} />
+                    <div className="col-span-8 sm:col-span-4">
+                      <InputArea
+                        register={register}
+                        label="discount"
+                        name="discount"
+                        type="number"
+                        placeholder="Discount"
+                      />
+                      <Error errorName={errors.discount} />
+
+                      {/* <RSelect options={options} placeholder="Flat"></RSelect> */}
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+                    <LabelArea label={t("Set Point")} />
+                    <div className="col-span-8 sm:col-span-4">
+                      <InputArea
+                        register={register}
+                        label="point"
+                        name="point"
+                        type="number"
+                        placeholder="0"
+                      />
+                      <Error errorName={errors.point} />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+                    <LabelArea label={t("Quantity")} />
+                    <div className="col-span-8 sm:col-span-4">
+                      <InputArea
+                        register={register}
+                        label="quantity"
+                        name="quantity"
+                        type="number"
+                        placeholder="0"
+                      />
+                      <Error errorName={errors.quantity} />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+                    <LabelArea label={t("SKU*")} />
+                    <div className="col-span-8 sm:col-span-4">
+                      <Input
+                        {...register(`sku`, {
+                          required: "SKU is required!",
+                        })}
+                        className="border h-12 text-sm focus:outline-none block w-full bg-gray-100 dark:bg-white border-transparent focus:bg-white"
+                        name="sku"
+                        type="text"
+                        placeholder={t("Sku")}
+                        // onBlur={(e) => handleProductSlug(e.target.value)}
+                      />
+                      <Error errorName={errors.sku} />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+                    <LabelArea label={t("External Link")} />
+                    <div className="col-span-8 sm:col-span-4">
+                      <InputArea
+                        register={register}
+                        label="externalLink"
+                        name="externalLink"
+                        type="text"
+                        placeholder="External Link"
+                      />
+                      <Error errorName={errors.externalLink} />
+
+                      <span>
+                        Leave it blanck if you do not use external site link
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+                    <LabelArea label={t("External Link button")} />
+                    <div className="col-span-8 sm:col-span-4">
+                      <InputArea
+                        register={register}
+                        label="externalLinkButtonText"
+                        name="externalLinkButtonText"
+                        type="text"
+                        placeholder="External Link button text"
+                      />
+                      <Error errorName={errors.externalLinkButtonText} />
+                      <span>
+                        Leave it blanck if you do not use external site link
+                      </span>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+                    <LabelArea label="Description*" />
+                    <div className="col-span-8 sm:col-span-4">
+                      <InputArea
+                        register={register}
+                        label="description"
+                        name="description"
+                        type="2"
+                        placeholder="Description"
+                      />
+                      <span>
+                        This is use for search input those words by which
+                        customer can find this product
+                      </span>
+                      <Error errorName={errors.name} />
+                    </div>
+                  </div>
+
+                  <div className="w-full relative pb- mb-6 border-b border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
+                    <Title register={register} title={t("PDF Specification")} />
+                  </div>
+
+                  <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+                    <LabelArea label={t("PDF Specification")} />
+                    <div className="col-span-8 sm:col-span-4">
+                      <div className=" border-gray">
+                        <div className=" p-2 inline-block">
+                          <Uploader
+                            accept=".pdf"
+                            imageUrl={pdfSpecification}
+                            setImageUrl={setPdfSpecification}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="w-full relative pb- mb-6 border-b border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
+                    <Title register={register} title={t("SEO Meta Tags")} />
+                  </div>
+
+                  <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+                    <LabelArea label={t("Meta Title")} />
+                    <div className="col-span-8 sm:col-span-4">
+                      <InputArea
+                        register={register}
+                        label="metaTitle"
+                        name="metaTitle"
+                        type="text"
+                        placeholder="Meta Title"
+                      />
+                      <Error errorName={errors.metaTitle} />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+                    <LabelArea label={t("Meta Description")} />
+                    <div className="col-span-8 sm:col-span-4">
+                      <InputArea
+                        register={register}
+                        label="metaDescription"
+                        name="metaDescription"
+                        type="text"
+                        placeholder="Meta Title"
+                      />
+                      <Error errorName={errors.metaDescription} />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+                    <LabelArea label={t("Meta Image")} />
+                    <div className="col-span-8 sm:col-span-4">
+                      <div className="border-gray">
+                        <div className="p-2 inline-block">
+                          <Uploader
+                            folder="product"
+                            imageUrl={metaImage}
+                            setImageUrl={setMetaImage}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  {/* 
 
 
                   <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
@@ -352,15 +795,15 @@ const ProductDrawer = ({ id }) => {
                         value={selectedUnit}
                         onChange={handleUnitChange}
                         isClearable
-                      // onChange={(e) => {
-                      //   setUnit("unit", e);
-                      // }}
-                      // error={formik?.errors?.categoryId}
-                      // touched={formik?.touched?.categoryId}
-                      // onBlur={formik?.handleBlur}
-                      // value={formik?.values?.categoryId}
-                      // name="category"
-                      // id="category"
+                        // onChange={(e) => {
+                        //   setUnit("unit", e);
+                        // }}
+                        // error={formik?.errors?.categoryId}
+                        // touched={formik?.touched?.categoryId}
+                        // onBlur={formik?.handleBlur}
+                        // value={formik?.values?.categoryId}
+                        // name="category"
+                        // id="category"
                       ></RSelect>
                       <Error errorName={errors.name} />
                     </div>
@@ -377,30 +820,12 @@ const ProductDrawer = ({ id }) => {
                         value={weight}
                         onChange={(e) => setweight(e.target.value)}
                         placeholder="0.00"
-
                       />
                       <Error errorName={errors.name} />
                     </div>
                   </div>
 
-
-                  <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
-                    <LabelArea label="Minimum Purchase Oty*" />
-                    <div className="col-span-8 sm:col-span-4">
-                      <InputArea
-                        register={register}
-                        label="minimumPurchaseQuantity"
-                        name="minimumPurchaseQuantity"
-                        type="number"
-                        value={minimumPurchaseQuantity}
-                        onChange={(e) => setMinimumPurchaseQuantity(e.target.value)}
-                        placeholder="1"
-
-                      />
-                      <Error errorName={errors.name} />
-                    </div>
-                  </div>
-
+           
 
                   <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
                     <LabelArea label="Tags*" />
@@ -413,13 +838,14 @@ const ProductDrawer = ({ id }) => {
                         value={tag}
                         onChange={(e) => setTag(e.target.value)}
                         placeholder="Type and hit enter to add a tag"
-
                       />
-                      <span>This is use for search input those words by which customer can find this product</span>
+                      <span>
+                        This is use for search input those words by which
+                        customer can find this product
+                      </span>
                       <Error errorName={errors.name} />
                     </div>
                   </div>
-
 
                   <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
                     <LabelArea label="Barcode" />
@@ -432,14 +858,11 @@ const ProductDrawer = ({ id }) => {
                         value={barcode}
                         onChange={(e) => setBarcode(e.target.value)}
                         placeholder="Barcode"
-
                       />
 
                       <Error errorName={errors.name} />
                     </div>
                   </div>
-
-
 
                   <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
                     <LabelArea label="Refundable" />
@@ -448,14 +871,8 @@ const ProductDrawer = ({ id }) => {
                     </div>
                   </div>
 
-
                   <div className="w-full relative pb-2 mb-6 border-b border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
-
-                    <Title
-                      register={register}
-
-                      title={t("Product Image")}
-                    />
+                    <Title register={register} title={t("Product Image")} />
                   </div>
 
                   <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
@@ -471,35 +888,13 @@ const ProductDrawer = ({ id }) => {
                           />
                         </div>
                       </div>
-
                     </div>
                   </div>
 
-
-                  <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
-                    <LabelArea label={t("Thumbnail Image (300x300)")} />
-                    <div className="col-span-8 sm:col-span-4">
-                      <div className=" border-gray">
-                        <div className="p-2 inline-block">
-                          <Uploader
-                            folder="product"
-                            imageUrl={thumbnailImage}
-                            setImageUrl={setThumbnailImage}
-                          />
-                        </div>
-
-                      </div>
-
-                    </div>
-                  </div>
-
+              
 
                   <div className="w-full relative pb-2 mb-6 border-b border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
-                    <Title
-                      register={register}
-
-                      title={t("Product Video")}
-                    />
+                    <Title register={register} title={t("Product Video")} />
                   </div>
                   <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
                     <LabelArea label={t("Video Provider")} />
@@ -511,13 +906,10 @@ const ProductDrawer = ({ id }) => {
                         value={videoProvider}
                         onChange={(e) => setVideoProvider(e.target.value)}
                         type="text"
-                        placeholder='YouTube'
-
+                        placeholder="YouTube"
                       />
-
                     </div>
                   </div>
-
 
                   <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
                     <LabelArea label={t("Video Link")} />
@@ -529,30 +921,25 @@ const ProductDrawer = ({ id }) => {
                         type="text"
                         value={videoLink}
                         onChange={(e) => setVideoLink(e.target.value)}
-                        placeholder='Video Link'
+                        placeholder="Video Link"
                       />
-                      <span>use proper link without extra paramater.Dont use short share link/embeded iframe code</span>
+                      <span>
+                        use proper link without extra paramater.Dont use short
+                        share link/embeded iframe code
+                      </span>
                     </div>
                   </div>
 
-
                   <div className="w-full relative pb-2 mb-6 border-b border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
-                    <Title
-                      register={register}
-
-                      title={t("Product Variation")}
-                    />
+                    <Title register={register} title={t("Product Variation")} />
                   </div>
                   <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
                     <LabelArea label={t("Color")} />
                     <div className="col-span-8 sm:col-span-4">
                       <RSelect
                         options={options}
-                        placeholder='nothing Selected'
-                      >
-
-                      </RSelect>
-
+                        placeholder="nothing Selected"
+                      ></RSelect>
                     </div>
                   </div>
 
@@ -562,18 +949,19 @@ const ProductDrawer = ({ id }) => {
                       <div className="col-span-8 sm:col-span-4">
                         <RSelect
                           options={options}
-                          placeholder='nothing Selected'
-                        >
-                        </RSelect>
+                          placeholder="nothing Selected"
+                        ></RSelect>
                       </div>
                     </div>
-                    <span>chosse the attributes off product and input valuse of each attribute</span>
+                    <span>
+                      chosse the attributes off product and input valuse of each
+                      attribute
+                    </span>
                   </div>
 
                   <div className="w-full relative pb- mb-6 border-b border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
                     <Title
                       register={register}
-
                       title={t("Product price + stock")}
                     />
                   </div>
@@ -583,10 +971,10 @@ const ProductDrawer = ({ id }) => {
                       <InputArea
                         register={register}
                         required="false"
-                        label='unitprice'
+                        label="unitprice"
                         name="unitprice"
                         type="number"
-                        placeholder='0'
+                        placeholder="0"
                       />
                     </div>
                   </div>
@@ -597,15 +985,13 @@ const ProductDrawer = ({ id }) => {
                       <InputArea
                         register={register}
                         required="false"
-                        label='discount'
+                        label="discount"
                         name="discount"
                         type="text"
-
-                        placeholder='Select data Range'
+                        placeholder="Select data Range"
                       />
                     </div>
                   </div>
-
 
                   <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
                     <LabelArea label={t("Discount")} />
@@ -613,24 +999,16 @@ const ProductDrawer = ({ id }) => {
                       <InputArea
                         register={register}
                         required="false"
-                        label='discountPrice'
+                        label="discountPrice"
                         name="discountPrice"
                         value={discountPrice}
                         onChange={(e) => setDiscountPrice(e.target.value)}
                         type="text"
-                        placeholder='Discount'
+                        placeholder="Discount"
                       />
-                      <RSelect
-                        options={options}
-                        placeholder='Flat'
-
-                      >
-
-                      </RSelect>
+                      <RSelect options={options} placeholder="Flat"></RSelect>
                     </div>
-
                   </div>
-
 
                   <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
                     <LabelArea label={t("Set Point")} />
@@ -638,17 +1016,15 @@ const ProductDrawer = ({ id }) => {
                       <InputArea
                         register={register}
                         required="false"
-                        label='point'
+                        label="point"
                         name="point"
                         value={point}
                         onChange={(e) => setPoint(e.target.value)}
                         type="number"
-
-                        placeholder='0'
+                        placeholder="0"
                       />
                     </div>
                   </div>
-
 
                   <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
                     <LabelArea label={t("Quantity")} />
@@ -656,10 +1032,10 @@ const ProductDrawer = ({ id }) => {
                       <InputArea
                         register={register}
                         required="false"
-                        label='unitprice'
+                        label="unitprice"
                         name="unitprice"
                         type="number"
-                        placeholder='0'
+                        placeholder="0"
                       />
                     </div>
                   </div>
@@ -674,7 +1050,6 @@ const ProductDrawer = ({ id }) => {
                         name="sku"
                         value={sku}
                         onChange={(e) => setSku(e.target.value)}
-
                         type="text"
                         placeholder={t("ProductSKU")}
                       />
@@ -688,14 +1063,16 @@ const ProductDrawer = ({ id }) => {
                       <InputArea
                         register={register}
                         required="false"
-                        label='externalLink'
+                        label="externalLink"
                         name="externalLink"
                         value={externalLink}
                         onChange={(e) => setExternalLink(e.target.value)}
                         type="text"
-                        placeholder='External Link'
+                        placeholder="External Link"
                       />
-                      <span>Leave it blanck if you do not use external site link</span>
+                      <span>
+                        Leave it blanck if you do not use external site link
+                      </span>
                     </div>
                   </div>
 
@@ -705,25 +1082,27 @@ const ProductDrawer = ({ id }) => {
                       <InputArea
                         register={register}
                         required="false"
-                        label='externalLinkButtonText'
+                        label="externalLinkButtonText"
                         name="externalLinkButtonText"
                         value={externalLinkButtonText}
-                        onChange={(e) => setExternalLinkButtonText(e.target.value)}
+                        onChange={(e) =>
+                          setExternalLinkButtonText(e.target.value)
+                        }
                         type="text"
-                        placeholder='External Link button text'
+                        placeholder="External Link button text"
                       />
-                      <span>Leave it blanck if you do not use external site link</span>
+                      <span>
+                        Leave it blanck if you do not use external site link
+                      </span>
                     </div>
                   </div>
 
                   <div className="w-full relative pb- mb-6 border-b border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
                     <Title
                       register={register}
-
                       title={t("Product Description")}
                     />
                   </div>
-
 
                   <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
                     <LabelArea label={t("ProductDescription")} />
@@ -744,13 +1123,8 @@ const ProductDrawer = ({ id }) => {
                     </div>
                   </div>
 
-
                   <div className="w-full relative pb- mb-6 border-b border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
-                    <Title
-                      register={register}
-
-                      title={t("PDF Specification")}
-                    />
+                    <Title register={register} title={t("PDF Specification")} />
                   </div>
 
                   <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
@@ -764,19 +1138,12 @@ const ProductDrawer = ({ id }) => {
                             setImageUrl={setPdfSpecification}
                           />
                         </div>
-
                       </div>
-
                     </div>
                   </div>
 
-
                   <div className="w-full relative pb- mb-6 border-b border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
-                    <Title
-                      register={register}
-
-                      title={t("SEO Meta Tags")}
-                    />
+                    <Title register={register} title={t("SEO Meta Tags")} />
                   </div>
 
                   <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
@@ -789,13 +1156,11 @@ const ProductDrawer = ({ id }) => {
                         value={metaTitle}
                         onChange={(e) => setMetaTitle(e.target.value)}
                         type="text"
-                        placeholder='Meta Title'
-
+                        placeholder="Meta Title"
                       />
                       <Error errorName={errors.name} />
                     </div>
                   </div>
-
 
                   <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
                     <LabelArea label={t("Description")} />
@@ -814,7 +1179,6 @@ const ProductDrawer = ({ id }) => {
                     </div>
                   </div>
 
-
                   <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
                     <LabelArea label={t("Meta Image")} />
                     <div className="col-span-8 sm:col-span-4">
@@ -826,21 +1190,18 @@ const ProductDrawer = ({ id }) => {
                             setImageUrl={setMetaImage}
                           />
                         </div>
-
                       </div>
-
                     </div>
-                  </div>
+                  </div> 
+                  */}
                 </div>
               </div>
 
               <div className="w-1/4 pl-3 pr-6 py-0">
-
                 <div className="bg-white shadow-md p-4 mb-8">
                   <div className="w-full relative pb- mb-6 border-b border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
                     <Title
                       register={register}
-
                       title={t("Shipping Configuration")}
                     />
                   </div>
@@ -850,7 +1211,6 @@ const ProductDrawer = ({ id }) => {
                       <LabelArea label={t("Free Shipping ")} />
                       <div className="col-span-8 sm:col-span-4">
                         <ShowHideButton status={true} />
-
                       </div>
                     </div>
 
@@ -858,7 +1218,6 @@ const ProductDrawer = ({ id }) => {
                       <LabelArea label={t("Flat Rate ")} />
                       <div className="col-span-8 sm:col-span-4">
                         <ShowHideButton status={true} />
-
                       </div>
                     </div>
 
@@ -866,19 +1225,16 @@ const ProductDrawer = ({ id }) => {
                       <LabelArea label={t("is Product Quantity Multiply ")} />
                       <div className="col-span-8 sm:col-span-4">
                         <ShowHideButton status={true} />
-
                       </div>
                     </div>
                   </div>
                 </div>
-
 
                 <div>
                   <div className="bg-white shadow-md p-4 mb-8">
                     <div className="w-full relative pb- mb-6 border-b border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
                       <Title
                         register={register}
-
                         title={t("low stock Quantity Warning")}
                       />
                     </div>
@@ -894,20 +1250,16 @@ const ProductDrawer = ({ id }) => {
                           onChange={(e) => setQuantity(e.target.value)}
                           type="number"
                           placeholder="1"
-
                         />
-
                       </div>
                     </div>
                   </div>
                 </div>
 
-
                 <div className="bg-white shadow-md p-4 mb-8">
                   <div className="w-full relative pb- mb-6 border-b border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
                     <Title
                       register={register}
-
                       title={t("Stock Visibility state")}
                     />
                   </div>
@@ -917,7 +1269,6 @@ const ProductDrawer = ({ id }) => {
                       <LabelArea label={t("Show Stock Quantity ")} />
                       <div className="col-span-8 sm:col-span-4">
                         <ShowHideButton status={true} />
-
                       </div>
                     </div>
 
@@ -925,7 +1276,6 @@ const ProductDrawer = ({ id }) => {
                       <LabelArea label={t("show stock with text only ")} />
                       <div className="col-span-8 sm:col-span-4">
                         <ShowHideButton status={true} />
-
                       </div>
                     </div>
 
@@ -933,19 +1283,16 @@ const ProductDrawer = ({ id }) => {
                       <LabelArea label={t("Hide Stock ")} />
                       <div className="col-span-8 sm:col-span-4">
                         <ShowHideButton status={true} />
-
                       </div>
                     </div>
                   </div>
                 </div>
-
 
                 <div>
                   <div className="bg-white shadow-md p-4 mb-8">
                     <div className="w-full relative pb- mb-6 border-b border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
                       <Title
                         register={register}
-
                         title={t("Cash on delivery")}
                       />
                     </div>
@@ -953,79 +1300,52 @@ const ProductDrawer = ({ id }) => {
                       <LabelArea label={t("Status ")} />
                       <div className="col-span-8 sm:col-span-4">
                         <ShowHideButton status={true} />
-
                       </div>
                     </div>
-
                   </div>
                 </div>
 
                 <div>
                   <div className="bg-white shadow-md p-4 mb-8">
                     <div className="w-full relative pb- mb-6 border-b border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
-                      <Title
-                        register={register}
-
-                        title={t("Featured")}
-                      />
+                      <Title register={register} title={t("Featured")} />
                     </div>
                     <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
                       <LabelArea label={t("Status ")} />
                       <div className="col-span-8 sm:col-span-4">
                         <ShowHideButton status={true} />
-
                       </div>
                     </div>
-
                   </div>
                 </div>
-
 
                 <div>
                   <div className="bg-white shadow-md p-4 mb-8">
                     <div className="w-full relative pb- mb-6 border-b border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
-                      <Title
-                        register={register}
-
-                        title={t("Today Deal")}
-                      />
+                      <Title register={register} title={t("Today Deal")} />
                     </div>
                     <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
                       <LabelArea label={t("Status ")} />
                       <div className="col-span-8 sm:col-span-4">
                         <ShowHideButton status={true} />
-
                       </div>
                     </div>
-
                   </div>
                 </div>
-
-
 
                 <div>
                   <div className="bg-white shadow-md p-4 mb-8">
                     <div className="w-full relative pb- mb-6 border-b border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
-                      <Title
-                        register={register}
-
-                        title={t("Flash Deal")}
-                      />
+                      <Title register={register} title={t("Flash Deal")} />
                     </div>
                     <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
                       <LabelArea label={t("Add to Flash  ")} />
                       <div className="col-span-8 sm:col-span-4">
-                        <RSelect
-                          options={options}
-                        >
-
-                        </RSelect>
-
+                        <RSelect options={options}></RSelect>
                       </div>
                     </div>
 
-
-                    <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+                    {/* <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
                       <LabelArea label={t("Discount  ")} />
                       <div className="col-span-8 sm:col-span-4">
                         <InputArea
@@ -1033,25 +1353,17 @@ const ProductDrawer = ({ id }) => {
                           label="Name"
                           name="name"
                           type="number"
-                          placeholder='0'
-
+                          placeholder="0"
                         />
-
                       </div>
-                    </div>
+                    </div> */}
 
                     <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
                       <LabelArea label={t("Discount Type  ")} />
                       <div className="col-span-8 sm:col-span-4">
-                        <RSelect
-                          options={options}
-                        >
-
-                        </RSelect>
-
+                        <RSelect options={options}></RSelect>
                       </div>
                     </div>
-
                   </div>
                 </div>
 
@@ -1059,12 +1371,11 @@ const ProductDrawer = ({ id }) => {
                   <div className="w-full relative pb- mb-6 border-b border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
                     <Title
                       register={register}
-
                       title={t("Estimate Shipping Time")}
                     />
                   </div>
 
-                  <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
+                  {/* <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
                     <LabelArea label={t("Shipping Days  ")} />
                     <div className="col-span-8 sm:col-span-4">
                       <InputArea
@@ -1072,22 +1383,15 @@ const ProductDrawer = ({ id }) => {
                         label="Name"
                         name="name"
                         type="text"
-                        placeholder='Shipping Days'
-
+                        placeholder="Shipping Days"
                       />
-
                     </div>
-                  </div>
-
+                  </div> */}
                 </div>
 
                 <div className="bg-white shadow-md p-4 mb-8">
-                  <div className="w-full relative pb- mb-6 border-b border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
-                    <Title
-                      register={register}
-
-                      title={t("Vat & tax")}
-                    />
+                  {/* <div className="w-full relative pb- mb-6 border-b border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
+                    <Title register={register} title={t("Vat & tax")} />
                   </div>
 
                   <div className="mb-6">
@@ -1101,22 +1405,14 @@ const ProductDrawer = ({ id }) => {
                           label="Name"
                           name="tax"
                           type="number"
-                          placeholder='0'
-
+                          placeholder="0"
                         />
                       </div>
                       <div className="w-1/2 px-1">
-                        <RSelect
-                          options={options}
-
-                        >
-
-                        </RSelect>
-
+                        <RSelect options={options}></RSelect>
                       </div>
                     </div>
                   </div>
-
 
                   <div className="mb-6">
                     <div className="mb-1">
@@ -1129,25 +1425,18 @@ const ProductDrawer = ({ id }) => {
                           label="Name"
                           name="name"
                           type="number"
-                          placeholder='0'
-
+                          placeholder="0"
                         />
                       </div>
                       <div className="w-1/2 px-1">
-                        <RSelect
-                          options={options}
-
-                        >
-                        </RSelect>
+                        <RSelect options={options}></RSelect>
                       </div>
                     </div>
-                  </div>
-
+                  </div> */}
 
                   {/* </div>
             </div> */}
                 </div>
-
 
                 <div>
                   {/* <div className="grid grid-cols-6 gap-3 md:gap-5 xl:gap-6 lg:gap-6 mb-6">
@@ -1308,15 +1597,11 @@ const ProductDrawer = ({ id }) => {
                     />
                   </div>
                 </div> */}
-
-
               </div>
-
-            </div >
+            </div>
           )}
 
-          {
-            tapValue === "Combination" &&
+          {tapValue === "Combination" &&
             isCombination &&
             (attribue.length < 1 ? (
               <div
@@ -1391,29 +1676,24 @@ const ProductDrawer = ({ id }) => {
                   )}
                 </div>
               </div>
-            ))
-          }
+            ))}
 
-          {
-            isCombination ? (
-              <DrawerButton
-                id={id}
-                save
-                title="Product"
-                isSubmitting={isSubmitting}
-                handleProductTap={handleProductTap}
-              />
-            ) : (
-              <DrawerButton id={id} title="Product" isSubmitting={isSubmitting} />
-            )
-          }
+          {isCombination ? (
+            <DrawerButton
+              id={id}
+              save
+              title="Product"
+              isSubmitting={isSubmitting}
+              handleProductTap={handleProductTap}
+            />
+          ) : (
+            <DrawerButton id={id} title="Product" isSubmitting={isSubmitting} />
+          )}
 
-          {
-            tapValue === "Combination" && (
-              <DrawerButton id={id} title="Product" isSubmitting={isSubmitting} />
-            )
-          }
-        </form >
+          {tapValue === "Combination" && (
+            <DrawerButton id={id} title="Product" isSubmitting={isSubmitting} />
+          )}
+        </form>
 
         {tapValue === "Combination" &&
           isCombination &&
@@ -1455,7 +1735,7 @@ const ProductDrawer = ({ id }) => {
               )}
             </div>
           )}
-      </Scrollbars >
+      </Scrollbars>
     </>
   );
 };

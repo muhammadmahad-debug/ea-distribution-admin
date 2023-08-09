@@ -13,10 +13,10 @@ import { notifyError, notifySuccess } from "utils/toast";
 import SettingServices from "services/SettingServices";
 import { showingTranslateValue } from "utils/translate";
 import CustomerServices from "services/CustomerServices";
-
+import { error } from "ajv/dist/vocabularies/applicator/dependencies";
+import { isElement } from "react-dom/test-utils";
 
 const useProductSubmit = (id) => {
-
   const location = useLocation();
   const { isDrawerOpen, closeDrawer, setIsUpdate, lang } =
     useContext(SidebarContext);
@@ -24,13 +24,12 @@ const useProductSubmit = (id) => {
   const { data: attribue } = useAsync(AttributeServices.getShowingAttributes);
   const { data: globalSetting } = useAsync(SettingServices.getGlobalSetting);
 
-
   // react ref
   const resetRef = useRef([]);
   const resetRefTwo = useRef("");
 
   // react hook
-  const [imageUrl, setImageUrl] = useState([]);
+
   const [tag, setTag] = useState([]);
   const [values, setValues] = useState({});
   let [variants, setVariants] = useState([]);
@@ -59,21 +58,65 @@ const useProductSubmit = (id) => {
   const [openModal, setOpenModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [slug, setSlug] = useState("");
-  const [weight, setweight] = useState("")
-  const [selectedBrand, setSelectedBrand] = useState("")
-  const [selectedUnit, setSelectedUnit] = useState('')
-  const [thumbnailImage, setThumbnailImage] = useState('')
-  const [videoProvider, setVideoProvider] = useState('')
-  const [videoLink, setVideoLink] = useState('')
-  const [externalLink, setExternalLink] = useState("")
-  const [externalLinkButtonText, setExternalLinkButtonText] = useState('')
-  const [metaTitle, setMetaTitle] = useState('')
-  const [metaImage, setMetaImage] = useState('')
-  const [category, setCategory] = useState('')
+  const [weight, setweight] = useState("");
+  const [selectedBrand, setSelectedBrand] = useState("");
+  const [selectedUnit, setSelectedUnit] = useState("");
+  const [videoProvider, setVideoProvider] = useState("");
+  const [videoLink, setVideoLink] = useState("");
+  const [externalLink, setExternalLink] = useState("");
+  const [externalLinkButtonText, setExternalLinkButtonText] = useState("");
+  const [metaTitle, setMetaTitle] = useState("");
+  const [category, setCategory] = useState("");
 
-  const [isFeatured, setIsFeatured] = useState(true)
-  const  [isPublished,setisPublished]=useState(true)
+  const [isFeatured, setIsFeatured] = useState(true);
+  const [isPublished, setisPublished] = useState(true);
 
+  //Mine-------------------------------------------------.
+  const [metaImage, setMetaImage] = useState("");
+  const [selectedSingleCategory, setselectedSingleCategory] = useState({});
+  const [tags, setTags] = useState([]);
+  const [tagInput, setTagInput] = useState("");
+  const [imageUrl, setImageUrl] = useState([]);
+  const [thumbnailImage, setThumbnailImage] = useState("");
+  const [pdfSpecification, setPdfSpecification] = useState("");
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    clearErrors,
+    reset,
+    formState: { errors },
+  } = useForm();
+
+  const handleKeyPress = (event) => {
+    if (event.key === "Enter" && tagInput.trim() !== "") {
+      event.preventDefault();
+      setTags([...tags, tagInput]);
+
+      setTagInput("");
+    }
+  };
+
+  useEffect(() => {
+    setValue("tag", tags);
+  }, [tags, setValue]);
+
+  useEffect(() => {
+    setValue("galleryImage", imageUrl);
+  }, [imageUrl]);
+  useEffect(() => {
+    setValue("thumbnailImage", thumbnailImage);
+  }, [thumbnailImage]);
+
+  useEffect(() => {
+    setValue("pdfSpecification", pdfSpecification);
+  }, [pdfSpecification]);
+  useEffect(() => {
+    setValue("metaImage", metaImage);
+  }, [metaImage]);
+
+  //-----------------------------------------------------
 
   // console.log("lang", lang);
 
@@ -95,319 +138,369 @@ const useProductSubmit = (id) => {
   //     return obj
   //   })
   //   console.log(options, "datatat")
-  const [minimumPurchaseQuantity, setMinimumPurchaseQuantity] = useState("")
-  const [discountPrice, setDiscountPrice] = useState("")
-  const [point, setPoint] = useState('')
-  const [metaDescription, setMetaDescription] = useState('')
-  const [pdfSpecification, setPdfSpecification] = useState('')
+  const [minimumPurchaseQuantity, setMinimumPurchaseQuantity] = useState("");
+  const [discountPrice, setDiscountPrice] = useState("");
+  const [point, setPoint] = useState("");
+  const [metaDescription, setMetaDescription] = useState("");
 
   const onCloseModal = () => setOpenModal(false);
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    clearErrors,
-    formState: { errors },
-  } = useForm();
 
   const onSubmit = async (data) => {
+    let obj = {
+      ...data,
+      isPublished: false,
+      isFeatured: false,
+      isCombination: false,
+    };
     try {
-      setIsSubmitting(true);
-      if (!imageUrl) return notifyError("Image is required!");
-
-      if (data.originalPrice < data.price) {
-        setIsSubmitting(false);
-        return notifyError(
-          "SalePrice must be less then or equal of product price!"
-        );
-      }
-      // if (!defaultCategory[0]) {
-      //   setIsSubmitting(false);
-      //   return notifyError("Default Category is required!");
-      // }
-
-      const updatedVariants = variants.map((v, i) => {
-        const newObj = {
-          ...v,
-          price: Number(v?.price || 0),
-          originalPrice: Number(v?.originalPrice || 0),
-          discount: Number(v?.discount || 0),
-          quantity: Number(v?.quantity || 0),
-        };
-        return newObj;
-      });
-
-      setIsBasicComplete(true);
-      setPrice(data.price);
-      setQuantity(data.stock);
-      setBarcode(data.barcode);
-      setSku(data.sku);
-      setOriginalPrice(data.originalPrice);
-
-
-
-      const productData = {
-        brand: selectedBrand,
-        unit: selectedUnit,
-        productId: productId,
-        sku: data.sku || "",
-        barcode: data.barcode || "",
-        title: {
-          [language]: data.title,
-        },
-        description: { [language]: data.description ? data.description : "" },
-        slug: data.slug
-          ? data.slug
-          : data.title.toLowerCase().replace(/[^A-Z0-9]+/gi, "-"),
-
-        // categories: selectedCategory.map((item) => item._id),
-        // category: defaultCategory[0]._id,
-
-        image: imageUrl,
-        stock: variants?.length < 1 ? data.stock : Number(totalStock),
-        tag: JSON.stringify(tag),
-
-        prices: {
-          price: Number(data.price) || 0,
-          originalPrice: data.originalPrice || 0,
-          discount: Number(data.originalPrice) - Number(data.price),
-        },
-        isCombination: updatedVariants?.length > 0 ? isCombination : false,
-        variants: isCombination ? updatedVariants : [],
-
-        weight: weight,
-        minimumPurchaseQuantity: minimumPurchaseQuantity,
-        tag: tag,
-        barcode: barcode,
-        thumbnailImage: thumbnailImage,
-        videoProvider: videoProvider,
-        videoLink: videoLink,
-        discountPrice: discountPrice,
-        point: point,
-        quantity: quantity,
-        sku: sku,
-        externalLink: externalLink,
-        externalLinkButtonText: externalLinkButtonText,
-        metaDescription: metaDescription,
-        metaTitle: metaTitle,
-        metaImage: metaImage,
-        pdfSpecification: pdfSpecification,
-        category: category,
-        isFeatured: isFeatured,
-        isPublished:isPublished
-
-      };
-
-      console.log("productData", productData, "data", data);
-      // return setIsSubmitting(false);
-
-      if (updatedId) {
-        const res = await ProductServices.updateProduct(updatedId, productData);
-        if (res) {
-          if (isCombination) {
-            setIsUpdate(true);
-            notifySuccess(res.message);
-            setIsBasicComplete(true);
-            setIsSubmitting(false);
-            handleProductTap("Combination", true);
-          } else {
-            setIsUpdate(true);
-            notifySuccess(res.message);
-            setIsSubmitting(false);
-          }
-        }
-
-        if (
-          tapValue === "Combination" ||
-          (tapValue !== "Combination" && !isCombination)
-        ) {
-          closeDrawer();
-        }
-      } else {
-        const res = await ProductServices.addProduct(productData);
-        console.log("res is ", res);
-        if (isCombination) {
-          setUpdatedId(res?._id);
-          console.log(res.id)
-          setValue("title", res.title[language ? language : "en"]);
-          setValue("description", res.description[language ? language : "en"]);
-          setValue("slug", res.slug);
-          setValue("show", res.show);
-          setValue("barcode", res.barcode);
-          setValue("stock", res.stock);
-          setTag(JSON.parse(res.tag));
-          setImageUrl(res.image);
-          setVariants(res.variants);
-          setValue("productId", res.productId);
-          setProductId(res.productId);
-          setOriginalPrice(res?.prices?.originalPrice);
-          setPrice(res?.prices?.price);
-          setBarcode(res.barcode);
-          setSku(res.sku);
-          // setcustomer(res.customers.customerId)
-          const result = res.variants.map(
-            ({
-              originalPrice,
-              price,
-              discount,
-              quantity,
-              barcode,
-              sku,
-              productId,
-              image,
-              ...rest
-            }) => rest
-          );
-
-          setVariant(result);
-          setIsUpdate(true);
-          setIsBasicComplete(true);
-          setIsSubmitting(false);
-          handleProductTap("Combination", true);
-          notifySuccess("Product Added Successfully!");
-        } else {
-          setIsUpdate(true);
-          notifySuccess("Product Added Successfully!");
-        }
-
-        if (
-          tapValue === "Combination" ||
-          (tapValue !== "Combination" && !isCombination)
-        ) {
-          setIsSubmitting(false);
-          closeDrawer();
-        }
-      }
-    } catch (err) {
-      console.log("err", err);
-      setIsSubmitting(false);
-      notifyError(err ? err?.response?.data?.message : err.message);
+      const res = await ProductServices.addProduct(obj);
+      notifySuccess("Product Added Successfully!");
+      reset();
       closeDrawer();
-    }
+    } catch (error) {}
+
+    // try {
+    //   const productData = {
+    //     brand: selectedBrand,
+    //     unit: selectedUnit,
+    //     productId: productId,
+    //     sku: data.sku || "",
+    //     barcode: data.barcode || "",
+    //     title: {
+    //       [language]: data.title,
+    //     },
+    //     description: { [language]: data.description ? data.description : "" },
+    //     slug: data.slug
+    //       ? data.slug
+    //       : data.title.toLowerCase().replace(/[^A-Z0-9]+/gi, "-"),
+
+    //     // categories: selectedCategory.map((item) => item._id),
+    //     // category: defaultCategory[0]._id,
+
+    //     image: imageUrl,
+    //     stock: variants?.length < 1 ? data.stock : Number(totalStock),
+    //     tag: JSON.stringify(tag),
+
+    //     prices: {
+    //       price: Number(data.price) || 0,
+    //       originalPrice: data.originalPrice || 0,
+    //       discount: Number(data.originalPrice) - Number(data.price),
+    //     },
+    //     isCombination: updatedVariants?.length > 0 ? isCombination : false,
+    //     variants: isCombination ? updatedVariants : [],
+
+    //     weight: weight,
+    //     minimumPurchaseQuantity: minimumPurchaseQuantity,
+    //     tag: tag,
+    //     barcode: barcode,
+    //     thumbnailImage: thumbnailImage,
+    //     videoProvider: videoProvider,
+    //     videoLink: videoLink,
+    //     discountPrice: discountPrice,
+    //     point: point,
+    //     quantity: quantity,
+    //     sku: sku,
+    //     externalLink: externalLink,
+    //     externalLinkButtonText: externalLinkButtonText,
+    //     metaDescription: metaDescription,
+    //     metaTitle: metaTitle,
+    //     metaImage: metaImage,
+    //     pdfSpecification: pdfSpecification,
+    //     category: selectedSingleCategory?.value,
+    //     isFeatured: isFeatured,
+    //     isPublished: isPublished,
+    //   };
+    //   const res = await ProductServices.addProduct(productData);
+    //   console.log("res is ", res);
+    //   console.log("productData>>>>>>>>>", productData, "data", data);
+    //   return;
+    //   setIsSubmitting(true);
+    //   if (!imageUrl) return notifyError("Image is required!");
+
+    //   if (data.originalPrice < data.price) {
+    //     setIsSubmitting(false);
+    //     return notifyError(
+    //       "SalePrice must be less then or equal of product price!"
+    //     );
+    //   }
+    //   // if (!defaultCategory[0]) {
+    //   //   setIsSubmitting(false);
+    //   //   return notifyError("Default Category is required!");
+    //   // }
+
+    //   const updatedVariants = variants.map((v, i) => {
+    //     const newObj = {
+    //       ...v,
+    //       price: Number(v?.price || 0),
+    //       originalPrice: Number(v?.originalPrice || 0),
+    //       discount: Number(v?.discount || 0),
+    //       quantity: Number(v?.quantity || 0),
+    //     };
+    //     return newObj;
+    //   });
+
+    //   setIsBasicComplete(true);
+    //   setPrice(data.price);
+    //   setQuantity(data.stock);
+    //   setBarcode(data.barcode);
+    //   setSku(data.sku);
+    //   setOriginalPrice(data.originalPrice);
+
+    //   // return setIsSubmitting(false);
+
+    //   if (updatedId) {
+    //     const res = await ProductServices.updateProduct(updatedId, productData);
+    //     if (res) {
+    //       if (isCombination) {
+    //         setIsUpdate(true);
+    //         notifySuccess(res.message);
+    //         setIsBasicComplete(true);
+    //         setIsSubmitting(false);
+    //         handleProductTap("Combination", true);
+    //       } else {
+    //         setIsUpdate(true);
+    //         notifySuccess(res.message);
+    //         setIsSubmitting(false);
+    //       }
+    //     }
+
+    //     if (
+    //       tapValue === "Combination" ||
+    //       (tapValue !== "Combination" && !isCombination)
+    //     ) {
+    //       closeDrawer();
+    //     }
+    //   } else {
+    //     const res = await ProductServices.addProduct(productData);
+    //     console.log("res is ", res);
+    //     if (isCombination) {
+    //       setUpdatedId(res?._id);
+    //       console.log(res.id);
+    //       setValue("title", res.title[language ? language : "en"]);
+    //       setValue("description", res.description[language ? language : "en"]);
+    //       setValue("slug", res.slug);
+    //       setValue("show", res.show);
+    //       setValue("barcode", res.barcode);
+    //       setValue("stock", res.stock);
+    //       setTag(JSON.parse(res.tag));
+    //       setImageUrl(res.image);
+    //       setVariants(res.variants);
+    //       setValue("productId", res.productId);
+    //       setProductId(res.productId);
+    //       setOriginalPrice(res?.prices?.originalPrice);
+    //       setPrice(res?.prices?.price);
+    //       setBarcode(res.barcode);
+    //       setSku(res.sku);
+    //       // setcustomer(res.customers.customerId)
+    //       const result = res.variants.map(
+    //         ({
+    //           originalPrice,
+    //           price,
+    //           discount,
+    //           quantity,
+    //           barcode,
+    //           sku,
+    //           productId,
+    //           image,
+    //           ...rest
+    //         }) => rest
+    //       );
+
+    //       setVariant(result);
+    //       setIsUpdate(true);
+    //       setIsBasicComplete(true);
+    //       setIsSubmitting(false);
+    //       handleProductTap("Combination", true);
+    //       notifySuccess("Product Added Successfully!");
+    //     } else {
+    //       setIsUpdate(true);
+    //       notifySuccess("Product Added Successfully!");
+    //     }
+
+    //     if (
+    //       tapValue === "Combination" ||
+    //       (tapValue !== "Combination" && !isCombination)
+    //     ) {
+    //       setIsSubmitting(false);
+    //       closeDrawer();
+    //     }
+    //   }
+    // } catch (err) {
+    //   console.log("err", err);
+    //   setIsSubmitting(false);
+    //   notifyError(err ? err?.response?.data?.message : err.message);
+    //   closeDrawer();
+    // }
   };
 
+  const getProductDataById = async (id) => {
+    try {
+      const res = await ProductServices.getProductById(id);
+      setValue("barcode", res.barcode);
+      setValue("description", res.description);
+      setValue("discount", res.discount);
+      setValue("externalLink", res.externalLink);
+      setValue("externalLinkButtonText", res.externalLinkButtonText);
+      setValue("metaDescription", res.metaDescription);
+      setValue("metaTitle", res.metaTitle);
+      setValue("minimumPurchaseQuantity", res.minimumPurchaseQuantity);
+      setValue("pdfSpecification", res.pdfSpecification);
+      setValue("quantity", res.quantity);
+      setValue("sku", res.sku);
+      setValue("slug", res.slug);
+      setValue("thumbnailImage", res.thumbnailImage);
+      setValue("title", res.title);
+      setValue("unitPrice", res.unitPrice);
+      setValue("videoLink", res.videoLink);
+      setValue("weight", res.weight);
+    } catch (error) {}
+  };
   useEffect(() => {
-    if (!isDrawerOpen) {
-      setSlug("");
-      setLanguage(lang);
-      setValue("language", language);
-      handleProductTap("Basic Info", true);
-      setResData({});
-      setValue("sku");
-      setValue("title");
-      setValue("slug");
-      setValue("description");
-      setValue("quantity");
-      setValue("stock");
-      setValue("originalPrice");
-      setValue("price");
-      setValue("barcode");
-      setValue("productId");
-
-      setProductId("");
-      // setValue('show');
-      setImageUrl([]);
-      setTag([]);
-      setVariants([]);
-      setVariant([]);
-      setValues({});
-      setTotalStock(0);
-      setSelectedCategory([]);
-      //setDefaultCategory([]);
-      if (location.pathname === "/products") {
-        // resetRefTwo?.current?.resetSelectedValues();
-      }
-
-      clearErrors("sku");
-      clearErrors("title");
-      clearErrors("slug");
-      clearErrors("description");
-      clearErrors("stock");
-      clearErrors("quantity");
-      setValue("stock", 0);
-      setValue("costPrice", 0);
-      setValue("price", 0);
-      setValue("originalPrice", 0);
-      clearErrors("show");
-      clearErrors("barcode");
-      setIsCombination(false);
-      setIsBasicComplete(false);
-      setIsSubmitting(false);
-      setAttributes([]);
-
-      setUpdatedId();
-      return;
-    } else {
-      handleProductTap("Basic Info", true);
-    }
-
     if (id) {
-      setIsBasicComplete(true);
-      (async () => {
-        try {
-          const res = await ProductServices.getProductById(id);
-
-          console.log("res", res);
-
-          if (res) {
-            setResData(res);
-            setSlug(res.slug);
-            setUpdatedId(res._id);
-            setValue("title", res.title[language ? language : "en"]);
-            setValue(
-              "description",
-              res.description[language ? language : "en"]
-            );
-            setValue("slug", res.slug);
-            setValue("show", res.show);
-            setValue("sku", res.sku);
-            setValue("barcode", res.barcode);
-            setValue("stock", res.stock);
-            setValue("productId", res.productId);
-            setValue("price", res?.prices?.price);
-            setValue("originalPrice", res?.prices?.originalPrice);
-            setValue("stock", res.stock);
-            setProductId(res.productId ? res.productId : res._id);
-            setBarcode(res.barcode);
-            setSku(res.sku);
-
-            res.categories.map((category) => {
-              category.name = showingTranslateValue(category?.name, lang);
-
-              return category;
-            });
-
-            res.category.name = showingTranslateValue(
-              res?.category?.name,
-              lang
-            );
-
-            setSelectedCategory(res.categories);
-            // setDefaultCategory([res?.category]);
-            setTag(JSON.parse(res.tag));
-            setImageUrl(res.image);
-            setVariants(res.variants);
-            setIsCombination(res.isCombination);
-            setQuantity(res?.stock);
-            setTotalStock(res.stock);
-            setOriginalPrice(res?.prices?.originalPrice);
-            setPrice(res?.prices?.price);
-          }
-        } catch (err) {
-          notifyError(err ? err?.response?.data?.message : err.message);
-        }
-      })();
+      getProductDataById(id);
+    } else {
+      setValue("barcode");
+      setValue("description");
+      setValue("discount");
+      setValue("externalLink");
+      setValue("externalLinkButtonText");
+      setValue("metaDescription");
+      setValue("metaTitle");
+      setValue("minimumPurchaseQuantity");
+      setValue("pdfSpecification");
+      setValue("quantity");
+      setValue("sku");
+      setValue("slug");
+      setValue("thumbnailImage");
+      setValue("title");
+      setValue("unitPrice");
+      setValue("videoLink");
+      setValue("weight");
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    id,
-    setValue,
-    isDrawerOpen,
-    location.pathname,
-    clearErrors,
-    language,
-    lang,
-  ]);
+  }, [id]);
+
+  // useEffect(() => {
+  //   if (!isDrawerOpen) {
+  //     setSlug("");
+  //     setLanguage(lang);
+  //     setValue("language", language);
+  //     handleProductTap("Basic Info", true);
+  //     setResData({});
+  //     setValue("sku");
+  //     setValue("title");
+  //     setValue("slug");
+  //     setValue("description");
+  //     setValue("quantity");
+  //     setValue("stock");
+  //     setValue("originalPrice");
+  //     setValue("price");
+  //     setValue("barcode");
+  //     setValue("productId");
+
+  //     setProductId("");
+  //     // setValue('show');
+  //     setImageUrl([]);
+  //     setTag([]);
+  //     setVariants([]);
+  //     setVariant([]);
+  //     setValues({});
+  //     setTotalStock(0);
+  //     setSelectedCategory([]);
+  //     //setDefaultCategory([]);
+  //     if (location.pathname === "/products") {
+  //       // resetRefTwo?.current?.resetSelectedValues();
+  //     }
+
+  //     clearErrors("sku");
+  //     clearErrors("title");
+  //     clearErrors("slug");
+  //     clearErrors("description");
+  //     clearErrors("stock");
+  //     clearErrors("quantity");
+  //     setValue("stock", 0);
+  //     setValue("costPrice", 0);
+  //     setValue("price", 0);
+  //     setValue("originalPrice", 0);
+  //     clearErrors("show");
+  //     clearErrors("barcode");
+  //     setIsCombination(false);
+  //     setIsBasicComplete(false);
+  //     setIsSubmitting(false);
+  //     setAttributes([]);
+
+  //     setUpdatedId();
+  //     return;
+  //   } else {
+  //     handleProductTap("Basic Info", true);
+  //   }
+
+  //   if (id) {
+  //     setIsBasicComplete(true);
+  //     (async () => {
+  //       try {
+  //         const res = await ProductServices.getProductById(id);
+
+  //         console.log("res", res);
+
+  //         if (res) {
+  //           setResData(res);
+  //           setSlug(res.slug);
+  //           setUpdatedId(res._id);
+  //           setValue("title", res.title[language ? language : "en"]);
+  //           setValue(
+  //             "description",
+  //             res.description[language ? language : "en"]
+  //           );
+  //           setValue("slug", res.slug);
+  //           setValue("show", res.show);
+  //           setValue("sku", res.sku);
+  //           setValue("barcode", res.barcode);
+  //           setValue("stock", res.stock);
+  //           setValue("productId", res.productId);
+  //           setValue("price", res?.prices?.price);
+  //           setValue("originalPrice", res?.prices?.originalPrice);
+  //           setValue("stock", res.stock);
+  //           setProductId(res.productId ? res.productId : res._id);
+  //           setBarcode(res.barcode);
+  //           setSku(res.sku);
+
+  //           res.categories.map((category) => {
+  //             category.name = showingTranslateValue(category?.name, lang);
+
+  //             return category;
+  //           });
+
+  //           res.category.name = showingTranslateValue(
+  //             res?.category?.name,
+  //             lang
+  //           );
+
+  //           setSelectedCategory(res.categories);
+  //           // setDefaultCategory([res?.category]);
+  //           setTag(JSON.parse(res.tag));
+  //           setImageUrl(res.image);
+  //           setVariants(res.variants);
+  //           setIsCombination(res.isCombination);
+  //           setQuantity(res?.stock);
+  //           setTotalStock(res.stock);
+  //           setOriginalPrice(res?.prices?.originalPrice);
+  //           setPrice(res?.prices?.price);
+  //         }
+  //       } catch (err) {
+  //         notifyError(err ? err?.response?.data?.message : err.message);
+  //       }
+  //     })();
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [
+  //   id,
+  //   setValue,
+  //   isDrawerOpen,
+  //   location.pathname,
+  //   clearErrors,
+  //   language,
+  //   lang,
+  // ]);
 
   //for filter related attribute and extras for every product which need to update
   useEffect(() => {
@@ -528,8 +621,9 @@ const useProductSubmit = (id) => {
     // console.log("handleRemoveVariant", vari, ext);
     swal({
       title: `Are you sure to delete this ${ext ? "Extra" : "combination"}!`,
-      text: `(If Okay, It will be delete this ${ext ? "Extra" : "combination"
-        })`,
+      text: `(If Okay, It will be delete this ${
+        ext ? "Extra" : "combination"
+      })`,
       icon: "warning",
       buttons: true,
       dangerMode: true,
@@ -722,8 +816,7 @@ const useProductSubmit = (id) => {
     thumbnailImage,
     setThumbnailImage,
     updatedId,
-    selectedBrand,
-    setSelectedBrand,
+
     selectedUnit,
     setSelectedUnit,
     videoLink,
@@ -756,10 +849,21 @@ const useProductSubmit = (id) => {
     isPublished,
     setisPublished,
     isFeatured,
-    setIsFeatured
+    setIsFeatured,
+    selectedSingleCategory,
+    setselectedSingleCategory,
 
-
-
+    //
+    selectedBrand,
+    setSelectedBrand,
+    setValue,
+    selectedSingleCategory,
+    setselectedSingleCategory,
+    tags,
+    setTags,
+    handleKeyPress,
+    tagInput,
+    setTagInput,
   };
 };
 
