@@ -8,6 +8,7 @@ import Sidebar from "components/sidebar/Sidebar";
 import { SidebarContext } from "context/SidebarContext";
 import ThemeSuspense from "components/theme/ThemeSuspense";
 
+
 const Page404 = lazy(() => import("../pages/404"));
 
 const Layout = () => {
